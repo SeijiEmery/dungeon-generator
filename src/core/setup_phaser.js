@@ -12,3 +12,10 @@ export function runPhaser (scene) {
     };
     return new Phaser.Game(config);
 }
+export function start(fn) {
+  if (document.readyState != 'loading'){
+    fn();
+  } else {
+    document.addEventListener('DOMContentLoaded', fn);
+  }
+}

@@ -12,8 +12,9 @@ Example:
     rebuild_phaser()
 """
 import os
-# from .utils import save_jinja_template, get_tile_assets, save_file
-from utils import save_jinja_template, get_tile_assets, save_file
+import subprocess
+from .utils import save_jinja_template, get_tile_assets, save_file
+# from utils import save_jinja_template, get_tile_assets, save_file
 
 ROOT_DIR = '.'
 INDENT_4 = ' ' * 4
@@ -55,6 +56,7 @@ def generate_assets_js():
         }
         for name, parts in tiles.items()
     }
+
     def generate():
         yield 'export const ASSETS_BY_CATEGORY = {\n%s};' % (''.join([
             "%s%s: [ %s ],\n" % (INDENT_4, category, ', '.join([
@@ -63,7 +65,7 @@ def generate_assets_js():
             for category, assets in asset_list.items()
         ]))
 
-        def flatten (xs):
+        def flatten(xs):
             for ys in xs:
                 for y in ys:
                     yield y
@@ -88,8 +90,28 @@ def generate_assets_js():
     # print(lines)
 
 
+def generate_webpack_builds(entry_dir='src/tests'):
+    for file in os.listdir(entry_dir):
+        if not file.endswith('.js'):
+            continue
+        filename = file.strip('.js')
+        entry_path = os.path.join(entry_dir, file)
+        config_path = os.path.join(
+            'build/webpack_configs/', filename + '.config.js')
+        output_path = os.path.join('build', filename + '.html')
+        save_file(config_path, '''module.exports = {{ 
+            entry: '{entry_path}', 
+            output: {{ filename: '{filename}.js', path: '{builddir}' }} 
+        }}'''.format(entry_path=os.path.abspath(entry_path), filename=filename, builddir=os.path.abspath('build')))
+        res = subprocess.call(["webpack-cli", "--config", config_path])
+        print(res)
+        save_jinja_template('templates/phaser_dynamic_template.html',
+            output_path, TITLE=filename, MAIN_JS=file)
+
+
 def rebuild_phaser():
     generate_assets_js()
+    generate_webpack_builds()
     return
 
     generator = PhaserCodeGenerator(
