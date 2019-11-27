@@ -88,6 +88,11 @@ def load_file(path):
 
 def save_file(path, data):
     """ Convenience function to save a text file + using <file>.write() """
+
+    basedir = os.path.split(path)[0]
+    if not os.path.exists(basedir):
+        os.makedirs(basedir)
+
     with open(path, 'w') as f:
         f.write(data)
 

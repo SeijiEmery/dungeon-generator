@@ -12,7 +12,8 @@ Example:
     rebuild_phaser()
 """
 import os
-from .utils import save_jinja_template, get_tile_assets
+# from .utils import save_jinja_template, get_tile_assets, save_file
+from utils import save_jinja_template, get_tile_assets, save_file
 
 ROOT_DIR = '.'
 INDENT_4 = ' ' * 4
@@ -45,7 +46,52 @@ class PhaserCodeGenerator:
             'build', self.name + '.html'), **args)
 
 
+def generate_assets_js():
+    tiles, asset_list = get_tile_assets('build/assets.yaml')
+    paths = {
+        name: {
+            direction: '/'.join(path.split('/')[1:])
+            for direction, path in parts.items()
+        }
+        for name, parts in tiles.items()
+    }
+    def generate():
+        yield 'export const ASSETS_BY_CATEGORY = {\n%s};' % (''.join([
+            "%s%s: [ %s ],\n" % (INDENT_4, category, ', '.join([
+                '"%s"' % asset for asset in assets.keys()
+            ]))
+            for category, assets in asset_list.items()
+        ]))
+
+        def flatten (xs):
+            for ys in xs:
+                for y in ys:
+                    yield y
+
+        yield 'export const ALL_ASSETS = [ %s ];' % ', '.join([
+            '"%s"' % asset
+            for asset in set(flatten([
+                assets.keys() for assets in asset_list.values()
+            ]))
+        ])
+        yield 'export const DIRECTIONS = [ "N", "S", "E", "W" ];'
+        yield 'export function loadAllAssets () {\n%s}' % ''.join([
+            '%sthis.load.image("%s_%s", "%s");\n' % (
+                INDENT_4, name, direction, paths[name][direction])
+            for category in asset_list.keys()
+            for name in asset_list[category].keys()
+            for direction in ('N', 'S', 'E', 'W')
+        ])
+
+    lines = '\n'.join(generate())
+    save_file('src/generated/assets.js', lines)
+    # print(lines)
+
+
 def rebuild_phaser():
+    generate_assets_js()
+    return
+
     generator = PhaserCodeGenerator(
         'templates/phaser_template.html', 'example')
 
