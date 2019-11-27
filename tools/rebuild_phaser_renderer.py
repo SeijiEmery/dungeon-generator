@@ -1,83 +1,20 @@
-from jinja2 import Template
-import yaml
+# -*- coding: utf-8 -*-
+"""Generates the phaser map generator client + renderer
+
+eg. build/example.html
+
+Can be run as a standalone script, or (typically) is called from flask_server
+
+Expects extract_assets to have been run first.
+
+Example:
+    from rebuild_phaser_renderer import rebuild_phaser
+    rebuild_phaser()
+"""
 import os
+from .utils import save_jinja_template, get_tile_assets
 
 ROOT_DIR = '.'
-
-
-def cached_load(func):
-    cache = {}
-
-    def load(file):
-        if file in cache:
-            return cache[file]
-        data = func(file)
-        cache[file] = data
-        return data
-    return load
-
-
-@cached_load
-def load_file(path):
-    with open(os.path.join(ROOT_DIR, path), 'r') as f:
-        return f.read()
-
-
-def save_file(path, data):
-    with open(os.path.join(ROOT_DIR, path), 'w') as f:
-        f.write(data)
-
-
-def save_template(template_html, output_html, *args, **kwargs):
-    template = Template(load_file(template_html))
-    save_file(output_html, template.render(*args, **kwargs))
-    print(template.render(*args, **kwargs))
-
-
-@cached_load
-def load_yaml(path):
-    return yaml.load(load_file(path))
-
-
-@cached_load
-def load_asset_pack(path):
-    data = load_yaml(path)
-    if 'asset_packs' in data:
-        all_packs = {}
-        for pack in data['asset_packs'].values():
-            all_packs.update(pack)
-        data = all_packs
-    return data
-
-
-@cached_load
-def get_tile_assets(path):
-    ASSET_CONFIG_PATH = 'config/asset_config.yaml'
-    asset_config = load_yaml(ASSET_CONFIG_PATH)['assets']
-    tiles = load_asset_pack(path)['tiles']
-    # print(asset_config)
-    # print(tiles.keys())
-
-    used_assets = set()
-    assets = {key: {} for key in asset_config.keys()}
-    for category, asset_list in asset_config.items():
-        for asset in asset_list:
-            if asset in tiles:
-                assets[category][asset] = tiles[asset]
-                used_assets.add(asset)
-            else:
-                print("ERROR %s: invalid asset '%s' in category '%s'" % (
-                    ASSET_CONFIG_PATH, category, asset
-                ))
-
-    unused_assets = set(tiles.keys()) - used_assets
-    print("Warning: %d / %d unused asset(s): %s" % (
-        len(unused_assets),
-        len(unused_assets) + len(used_assets),
-        ", ".join(unused_assets)))
-    return tiles, assets
-
-
 INDENT_4 = ' ' * 4
 INDENT_8 = ' ' * 8
 
@@ -104,7 +41,7 @@ class PhaserCodeGenerator:
     def generate(self):
         args = {k: '\n'.join(v).strip() for k, v in self.args.items()}
         args['TITLE'] = self.name
-        save_template(self.src_template, os.path.join(
+        save_jinja_template(self.src_template, os.path.join(
             'build', self.name + '.html'), **args)
 
 

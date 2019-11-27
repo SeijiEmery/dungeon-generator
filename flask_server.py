@@ -1,9 +1,6 @@
 from flask import Flask
-from tools.extract_assets import extract_all_assets
-from tools.rebuild_phaser_renderer import rebuild_phaser
+from tools import rebuild
 import webbrowser
-import os
-
 
 HTTP_ENDPOINT = 'http://127.0.0.1:5000'
 
@@ -11,8 +8,7 @@ HTTP_ENDPOINT = 'http://127.0.0.1:5000'
 app = Flask(__name__, static_folder='build', static_url_path='/static')
 
 if __name__ == "__main__":
-    extract_all_assets()
-    rebuild_phaser()
+    rebuild()
     EXAMPLE_URL = HTTP_ENDPOINT + '/static/example.html'
     print(EXAMPLE_URL)
     webbrowser.open_new(EXAMPLE_URL)
