@@ -1,0 +1,24 @@
+assets:
+  walls:
+    - stoneWall
+    - stoneWallAged
+
+  walls_end:
+    - stoneWallBroken
+
+  floors:
+    - dirt
+    - stoneTile
+    - stoneUneven
+
+  objects:
+    - barrel
+    - barrels
+    - barrelsStacked
+    - chair
+    - tableChairsBroken
+    - tableRound
+
+  stairs:
+    - stairs
+    - stairsAged
