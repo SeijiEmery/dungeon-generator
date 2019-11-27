@@ -1,6 +1,10 @@
 from jinja2 import Template
 import os
 
+ROOT_DIR = '.'
+TEMPLATES_DIR = os.path.join(ROOT_DIR, 'templates')
+BUILD_DIR = os.path.join(ROOT_DIR, 'build')
+
 
 def load_file(path):
     with open(path, 'r') as f:
@@ -12,14 +16,12 @@ def save_file(path, data):
         f.write(data)
 
 
-def save_template(template_html, *args, **kwargs):
-    template = Template(load_file(os.path.join('templates', template_html)))
-    print(template.render())
-    print(args)
-    print(kwargs)
-    save_file(os.path.join('build', template_html),
-        template.render(*args, **kwargs))
-    print(template.render(*args, **kwargs))
+def save_template(template_html, output_html, *args, **kwargs):
+    src_path = os.path.join(ROOT_DIR, template_html)
+    dst_path = os.path.join(ROOT_DIR, output_html)
+    template = Template(load_file(src_path))
+    save_file(dst_path, template.render(*args, **kwargs))
+    # print(template.render(*args, **kwargs))
 
 
 def rebuild_phaser():
@@ -37,9 +39,10 @@ def rebuild_phaser():
 
     """
 
-    save_template('example.html', **{
+    save_template('templates/phaser_template.html', 'build/example.html', **{
         k: v.strip() for k, v in args.items()
     })
+
 
 if __name__ == '__main__':
     rebuild_phaser()

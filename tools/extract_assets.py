@@ -3,7 +3,6 @@ import re
 import zipfile
 import yaml
 
-
 ASSETS_YAML_PATH = 'build/assets.yaml'
 ASSETS_DIR = 'build/assets'
 
@@ -26,6 +25,7 @@ def write_yaml(file, obj):
 
 
 def extract_all_assets(dir='assets', target_dir=ASSETS_DIR):
+    print(list(os.listdir('.')))
     asset_packs = {'asset_packs': {}}
     for file in os.listdir(dir):
         if file.endswith('.zip'):

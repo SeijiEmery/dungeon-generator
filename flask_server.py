@@ -1,6 +1,6 @@
 from flask import Flask
-from extract_assets import extract_all_assets
-from rebuild_phaser import rebuild_phaser
+from tools.extract_assets import extract_all_assets
+from tools.rebuild_phaser_renderer import rebuild_phaser
 import webbrowser
 import os
 
