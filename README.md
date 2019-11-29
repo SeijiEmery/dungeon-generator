@@ -4,10 +4,12 @@
 
     git clone https://github.com/seijiemery/dungeon-generator
     cd dungeon-generator
+    npm install
     ./run.sh
 
 ## Dependencies:
 
+    npm
     python 3.x
     pip3 install flask PyYAML Jinja2
 
