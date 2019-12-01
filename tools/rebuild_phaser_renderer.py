@@ -60,6 +60,7 @@ def generate_assets_js():
         ])
 
     lines = '\n'.join(generate())
+    print("rebuilt ../src/generated/assets.js")
     save_file('../src/generated/assets.js', lines)
     # print(lines)
 

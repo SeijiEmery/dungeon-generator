@@ -117,7 +117,7 @@ def load_asset_pack(path):
 
 @cached_load
 def get_tile_assets(path):
-    ASSET_CONFIG_PATH = '../config/asset_config.yaml'
+    ASSET_CONFIG_PATH = '../assets/asset_config.yaml'
     asset_config = load_yaml(ASSET_CONFIG_PATH)['assets']
     tiles = load_asset_pack(path)['tiles']
     # print(asset_config)
