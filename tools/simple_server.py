@@ -118,9 +118,6 @@ def run_observers():
 
     class Handler (FileSystemEventHandler):
         def on_any_event(self, event):
-            if event.is_directory:
-                pass
-
             def relaunch_self():
                 pass
 
@@ -128,9 +125,13 @@ def run_observers():
                 if not event.src_path.startswith('../src/generated'):
                     generate_webpack_builds()
 
+            def rebuild_assets():
+                generate_assets_js()
+                generate_webpack_builds()
+
             event_handlers = {
-                '../assets': (extract_all_assets, generate_assets_js),
-                '../config': (extract_all_assets, generate_assets_js, maybe_rebuild_phaser),
+                '../assets': (extract_all_assets, rebuild_assets),
+                '../config': (extract_all_assets, rebuild_assets),
                 '../templates': (maybe_rebuild_phaser,),
                 '../tools': (relaunch_self,),
                 '../src': (maybe_rebuild_phaser,),

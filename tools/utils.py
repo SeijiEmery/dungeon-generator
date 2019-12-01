@@ -73,13 +73,11 @@ def write_yaml(file, obj):
     save_file(file, yaml.dump(obj))
 
 
-@cached_load
 def load_yaml(path):
     """ Loads a yaml file as a python object """
     return yaml.load(load_file(path))
 
 
-@cached_load
 def load_file(path):
     """ Convenience function to load a text file + call <file>.read() """
     with open(path, 'r') as f:
@@ -104,7 +102,6 @@ def save_jinja_template(template_html, output_html, *args, **kwargs):
     # print(template.render(*args, **kwargs))
 
 
-@cached_load
 def load_asset_pack(path):
     data = load_yaml(path)
     if 'asset_packs' in data:
@@ -115,7 +112,6 @@ def load_asset_pack(path):
     return data
 
 
-@cached_load
 def get_tile_assets(path):
     ASSET_CONFIG_PATH = '../assets/asset_config.yaml'
     asset_config = load_yaml(ASSET_CONFIG_PATH)['assets']
