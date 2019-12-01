@@ -105,8 +105,8 @@ def generate_webpack_builds(entry_dir='src/tests'):
         }}'''.format(entry_path=os.path.abspath(entry_path), filename=filename, builddir=os.path.abspath('build')))
         res = subprocess.call(["webpack-cli", "--config", config_path])
         print(res)
-        save_jinja_template('templates/phaser_dynamic_template.html',
             output_path, TITLE=filename, MAIN_JS=file)
+            save_jinja_template('../templates/phaser_template.html',
 
 
 def rebuild_phaser():

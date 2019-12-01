@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <title>{{TITLE}}</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/phaser/3.19.0/phaser.js"></script>
+    <script src="{{MAIN_JS}}"></script>
     <style type="text/css">
         body {
             margin: 0;
@@ -11,36 +12,5 @@
     </style>
 </head>
 <body>
-<script type="text/javascript">
-
-    var config = {
-        type: Phaser.AUTO,
-        width: 800,
-        height: 600,
-        scene: {
-            preload: preload,
-            create: create,
-            update: update
-        }
-    };
-    {{INIT}}
-    var game = new Phaser.Game(config);
-
-    function preload ()
-    {
-        {{PRELOAD}}
-    }
-
-    function create ()
-    {
-        {{CREATE}}
-    }
-
-    function update ()
-    {
-        {{UPDATE}}
-    }
-
-</script>
 </body>
 </html>
