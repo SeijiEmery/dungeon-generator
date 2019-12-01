@@ -5,7 +5,7 @@
     git clone https://github.com/seijiemery/dungeon-generator
     cd dungeon-generator
     npm install
-    ./run.sh
+    ./run.sh isometric_render_test
 
 ## Dependencies:
 
@@ -41,8 +41,15 @@ Note that with the anaconda package, invalid code formatting will be shown in su
 
 ## TODO: (map generation, in no particular order)
 
-- write the js framework for map generation
-- write the map renderer backend (also js)
+- finish map renderer (and move into core...?)
+- move + drag camera
+- put tile cursor in world so you can select tiles
+- map rotation...? (possible; noncritical but could def do this)
+- build out map generator framework / API
+- MAP GENERATION
+- figure how the hell we're going to traverse through one of these maps, IF we're still going to do that...
+- map editor...? (noncritical, but user generated maps...?)
+- more python backend stuff
 - add a digital ocean instance (or just use heroku) so we can deploy this. (note: we don't need to do this until the end of the project, but this is what we'd do for deployment + demoing)
 - add all the other TODO items that need to go on this list... >_<
 
