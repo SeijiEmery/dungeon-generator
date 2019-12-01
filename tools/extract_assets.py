@@ -17,13 +17,13 @@ Example:
 import os
 import re
 import yaml
-from .utils import write_yaml, extract_zip
+from utils import write_yaml, extract_zip
 
-ASSETS_YAML_PATH = 'build/assets.yaml'
-ASSETS_DIR = 'build/assets'
+ASSETS_YAML_PATH = '../build/assets.yaml'
+ASSETS_DIR = '../build/assets'
 
 
-def extract_all_assets(dir='assets', target_dir=ASSETS_DIR):
+def extract_all_assets(dir='../assets', target_dir=ASSETS_DIR):
     """ Finds, extracts, and processes all asset packs into target_dir.
 
     Each asset pack is a .zip file, and should be a zipped kenney.nl isometric
@@ -103,5 +103,4 @@ def summarize_asset_pack(path, asset_pack_name, target_dir=ASSETS_DIR):
 
 
 if __name__ == '__main__':
-    os.chdir('..')
     extract_all_assets()

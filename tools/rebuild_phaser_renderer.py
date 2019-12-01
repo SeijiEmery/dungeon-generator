@@ -13,7 +13,7 @@ Example:
 """
 import os
 import subprocess
-from .utils import save_jinja_template, get_tile_assets, save_file
+from utils import save_jinja_template, get_tile_assets, save_file
 # from utils import save_jinja_template, get_tile_assets, save_file
 
 ROOT_DIR = '.'
@@ -21,37 +21,11 @@ INDENT_4 = ' ' * 4
 INDENT_8 = ' ' * 8
 
 
-class PhaserCodeGenerator:
-    def __init__(self, src_template, name):
-        self.src_template = src_template
-        self.name = name
-        self.args = {k: list()
-                     for k in ('INIT', 'PRELOAD', 'CREATE', 'UPDATE')}
-
-    def init(self, fcn):
-        self.args['INIT'].append(fcn())
-
-    def preload(self, fcn):
-        self.args['PRELOAD'].append(fcn())
-
-    def create(self, fcn):
-        self.args['CREATE'].append(fcn())
-
-    def update(self, fcn):
-        self.args['UPDATE'].append(fcn())
-
-    def generate(self):
-        args = {k: '\n'.join(v).strip() for k, v in self.args.items()}
-        args['TITLE'] = self.name
-        save_jinja_template(self.src_template, os.path.join(
-            'build', self.name + '.html'), **args)
-
-
 def generate_assets_js():
-    tiles, asset_list = get_tile_assets('build/assets.yaml')
+    tiles, asset_list = get_tile_assets('../build/assets.yaml')
     paths = {
         name: {
-            direction: '/'.join(path.split('/')[1:])
+            direction: path.replace('../build/assets', './assets')
             for direction, path in parts.items()
         }
         for name, parts in tiles.items()
@@ -86,114 +60,38 @@ def generate_assets_js():
         ])
 
     lines = '\n'.join(generate())
-    save_file('src/generated/assets.js', lines)
+    save_file('../src/generated/assets.js', lines)
     # print(lines)
 
 
-def generate_webpack_builds(entry_dir='src/tests'):
+def generate_webpack_builds(entry_dir='../src/tests'):
     for file in os.listdir(entry_dir):
         if not file.endswith('.js'):
             continue
         filename = file.strip('.js')
         entry_path = os.path.join(entry_dir, file)
         config_path = os.path.join(
-            'build/webpack_configs/', filename + '.config.js')
-        output_path = os.path.join('build', filename + '.html')
-        save_file(config_path, '''module.exports = {{ 
-            entry: '{entry_path}', 
-            output: {{ filename: '{filename}.js', path: '{builddir}' }} 
-        }}'''.format(entry_path=os.path.abspath(entry_path), filename=filename, builddir=os.path.abspath('build')))
-        res = subprocess.call(["webpack-cli", "--config", config_path])
-        print(res)
-            output_path, TITLE=filename, MAIN_JS=file)
+            '../build/webpack_configs/', filename + '.config.js')
+        output_path = os.path.join('../build', filename + '.html')
+        save_file(config_path, '''module.exports = {{
+            entry: '{entry_path}',
+            mode: 'development',
+            output: {{ filename: '{filename}.js', path: '{builddir}' }}
+        }}'''.format(entry_path=os.path.abspath(entry_path), filename=filename,
+                     builddir=os.path.abspath('../build')))
+
+        res = subprocess.run(
+            ["webpack-cli", "--config", config_path, "--display=minimal"], capture_output=True)
+        if res.returncode == 0:
             save_jinja_template('../templates/phaser_template.html',
+                                output_path, TITLE=filename, MAIN_JS=file)
 
 
 def rebuild_phaser():
     generate_assets_js()
     generate_webpack_builds()
-    return
-
-    generator = PhaserCodeGenerator(
-        'templates/phaser_template.html', 'example')
-
-    tiles, asset_list = get_tile_assets('build/assets.yaml')
-    paths = {
-        name: {
-            direction: '/'.join(path.split('/')[1:])
-            for direction, path in parts.items()
-        }
-        for name, parts in tiles.items()
-    }
-
-    # Add a list of all assets, by category, for use on the js side
-
-    @generator.init
-    def add_asset_defns():
-        return '%svar assets = {\n%s%s};' % (INDENT_4, ''.join([
-            '%s%s: [ %s ],\n' % (INDENT_8, category, ', '.join([
-                '"%s"' % asset for asset in assets.keys()
-            ]))
-            for category, assets in asset_list.items()
-        ]), INDENT_4)
-
-    # load all selected assets (filtered by config/asset_config.yaml)
-
-    @generator.preload
-    def load_assets():
-        return ''.join([
-            '%sthis.load.image("%s_%s", "%s");\n' % (
-                INDENT_8, name, direction, paths[name][direction])
-            for category in asset_list.keys()
-            for name in asset_list[category].keys()
-            for direction in ('N', 'S', 'E', 'W')
-        ])
-
-    # testing: add a barrel
-
-    @generator.create
-    def show_barrel():
-        return '%sthis.add.image(400, 300, "barrel_E");' % INDENT_8
-
-    # testing: add a randomly chosen sprite every update
-
-    @generator.init
-    def update_add_random_constants():
-        return """
-            var random = Math.random;
-            var ASSET_CATEGORIES = [ {categories} ];
-            var ASSET_DIRECTIONS = [ 'N', 'S', 'E', 'W' ];
-            function randint (n) {{
-                return (random() * n)|0;
-            }}
-            function randomArrayPick (array) {{
-                return array[randint(array.length)];
-            }}
-            function randomArrayPickOf (array) {{
-                return function () {{ return randomArrayPick(array); }};
-            }}
-            var randomCategory = randomArrayPickOf(ASSET_CATEGORIES);
-            var randomAsset = function () {{
-                return randomArrayPick(assets[randomCategory()]);
-            }};
-            var randomDir = randomArrayPickOf(ASSET_DIRECTIONS);
-            var randomSprite = function () {{
-                return randomAsset()+'_'+randomDir();
-            }};
-        """.format(
-            categories=', '.join(['"%s"' % k for k in asset_list.keys()]),
-            count=len(asset_list.keys()),
-        )
-
-    @generator.update
-    def update_add_random():
-        return """
-            this.add.image((random()*800)|0, (random()*600)|0, randomSprite());
-        """.strip().format(asset_count=len(asset_list))
-
-    generator.generate()
 
 
 if __name__ == '__main__':
-    os.chdir('..')
+    # os.chdir('..')
     rebuild_phaser()

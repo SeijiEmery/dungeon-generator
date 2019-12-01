@@ -101,7 +101,7 @@ def save_jinja_template(template_html, output_html, *args, **kwargs):
     template = Template(load_file(template_html))
     save_file(output_html, template.render(*args, **kwargs))
     print("generated %s:" % output_html)
-    print(template.render(*args, **kwargs))
+    # print(template.render(*args, **kwargs))
 
 
 @cached_load
@@ -117,7 +117,7 @@ def load_asset_pack(path):
 
 @cached_load
 def get_tile_assets(path):
-    ASSET_CONFIG_PATH = 'config/asset_config.yaml'
+    ASSET_CONFIG_PATH = '../config/asset_config.yaml'
     asset_config = load_yaml(ASSET_CONFIG_PATH)['assets']
     tiles = load_asset_pack(path)['tiles']
     # print(asset_config)
