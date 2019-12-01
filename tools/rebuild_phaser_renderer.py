@@ -85,6 +85,11 @@ def generate_webpack_builds(entry_dir='../src/tests'):
         if res.returncode == 0:
             save_jinja_template('../templates/phaser_template.html',
                                 output_path, TITLE=filename, MAIN_JS=file)
+        else:
+            error_msg = res.stdout.decode("utf-8")
+            print("\nError while generating '../build/%s.html':\n%s\n" % (filename, error_msg))
+            save_jinja_template('../templates/error.html',
+                                output_path, TITLE=filename, ERROR=error_msg.replace('\n', '<p>'))
 
 
 def rebuild_phaser():
