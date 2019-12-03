@@ -4,36 +4,56 @@ assets:
     - stoneWallAged
     - stoneWallStructure
     - stoneWallWindow
-    - stoneWallWindowbars
+    - stoneWallWindowBars
     - stoneWallHalf
     - stoneWallGate
     - stoneWallGateBars
     - stoneWallGateClosed
     - stoneWallGateOpen
+    - wallBooks
+    - wallDoorway
 
   walls_end:
     - stoneWallBroken
 
   floors:
     - dirt
-    - stoneTile
+    # - stoneTile
     - stoneUneven
-    - dirtTiles
+    # - dirtTiles
     - stone
 
   objects:
-    - barrel
-    - barrels
-    - barrelsStacked
-    - chair
-    - tableChairsBroken
-    - tableRound
-    - stairs
-    - stairsAged
-    - stairsSpiral
-    - planks
-    - bridge
-    - bridgeBroken
+    # - barrel
+    # - barrels
+    # - barrelsStacked
+    # - chair
+    # - tableChairsBroken
+    # - tableRound
+    # - stairs
+    # - stairsAged
+    # - stairsSpiral
+    # - planks
+    # - bridge
+    # - bridgeBroken
+    - bookcaseBooks
+    - bookcaseBooksLadder
+    - bookcaseDestroyed
+    - bookcaseEmpty
+    - bookcaseEmptyLadder
+    - bookcaseFallen
+    - bookcaseGlass
+    - bookcaseHalfBooks
+    - bookcaseHalfEmpty
+    - bookcaseHalfWideBooks
+    - displayCase
+    - displayCaseBooks
+    - displayCaseSword
+    - floorCarpet
+    - floorCarpetSmall
+    - longTable
+    - longTableChairs
+    - longTableDecorated
 
   stairs:
     - stairs

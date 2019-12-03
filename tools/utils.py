@@ -102,12 +102,24 @@ def save_jinja_template(template_html, output_html, *args, **kwargs):
     # print(template.render(*args, **kwargs))
 
 
+def deep_update(target, src):
+    for k, v in src.items():
+        if k in target and type(target[k]) == type(v) and type(v) == dict:
+            deep_update(target[k], v)
+        else:
+            target[k] = v
+
+
 def load_asset_pack(path):
     data = load_yaml(path)
     if 'asset_packs' in data:
         all_packs = {}
+        print("Found %d asset pack(s): %s"%(
+            len(data['asset_packs']),
+            ', '.join(data['asset_packs'].keys())))
         for pack in data['asset_packs'].values():
-            all_packs.update(pack)
+            deep_update(all_packs, pack)
+            print("update: %s"%', '.join(all_packs['tiles'].keys()))
         data = all_packs
     return data
 
@@ -128,7 +140,7 @@ def get_tile_assets(path):
                 used_assets.add(asset)
             else:
                 print("ERROR %s: invalid asset '%s' in category '%s'" % (
-                    ASSET_CONFIG_PATH, category, asset
+                    ASSET_CONFIG_PATH, asset, category
                 ))
 
     unused_assets = set(tiles.keys()) - used_assets
