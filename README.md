@@ -2,6 +2,8 @@
 
 ## Quickstart: to fetch + build + run this:
 
+    npm install -g webpack-cli
+    pip3 install watchdog PyYAML Jinja2
     git clone https://github.com/seijiemery/dungeon-generator
     cd dungeon-generator
     ./run.sh isometric_render_test
@@ -10,8 +12,6 @@
 
     npm
     python 3.8.x
-    npm install -g webpack-cli
-    pip3 install watchdog PyYAML Jinja2
     
 ## WINDOWS INSTALL INSTRUCTIONS
 
