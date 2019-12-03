@@ -6,6 +6,7 @@
     pip3 install watchdog PyYAML Jinja2
     git clone https://github.com/seijiemery/dungeon-generator
     cd dungeon-generator
+    npm install
     ./run.sh isometric_render_test
 
 ## Dependencies:
@@ -16,16 +17,9 @@
 ## WINDOWS INSTALL INSTRUCTIONS
 
 - Install WSL: https://docs.microsoft.com/en-us/windows/wsl/install-win10
-- open bash + run: 
-
-```bash
-    sudo apt install python3.8 python3-pip npm
-    pip3 install watchdog PyYAML Jinja2
-    npm install -g webpack-cli
-    git clone https://github.com/seijiemery/dungeon-generator
-    cd dungeon-generator
-    ./run.sh isometric_render_test
-```
+- open bash
+- install dependencies: `sudo apt install python3.8 python3-pip npm`
+- run the code in quickstart
 
 ## Overview:
 
