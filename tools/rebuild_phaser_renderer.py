@@ -25,7 +25,7 @@ def generate_assets_js():
     tiles, asset_list = get_tile_assets('../build/assets.yaml')
     paths = {
         name: {
-            direction: path.replace('../build/assets', './assets')
+            direction: path.replace('\\','/').replace('../build/assets', './assets')
             for direction, path in parts.items()
         }
         for name, parts in tiles.items()
@@ -78,16 +78,18 @@ def generate_webpack_builds(entry_dir='../src/tests'):
             entry: '{entry_path}',
             mode: 'development',
             output: {{ filename: '{filename}.js', path: '{builddir}' }}
-        }}'''.format(entry_path=os.path.abspath(entry_path), filename=filename,
-                     builddir=os.path.abspath('../build')))
+        }}'''.format(entry_path=os.path.abspath(entry_path).replace('\\','\\\\'), 
+                    filename=filename,
+                    builddir=os.path.abspath('../build').replace('\\','\\\\')))
 
         res = subprocess.run(
-            ["webpack-cli", "--config", config_path, "--display=minimal"], capture_output=True)
+            "webpack-cli --config {} --display=minimal".format(config_path), 
+            shell=True,capture_output=True)
         if res.returncode == 0:
             save_jinja_template('../templates/phaser_template.html',
                                 output_path, TITLE=filename, MAIN_JS=file)
         else:
-            error_msg = res.stdout.decode("utf-8")
+            error_msg = res.stdout.decode("utf-8") + res.stderr.decode("utf-8")
             print("\nError while generating '../build/%s.html':\n%s\n" % (filename, error_msg))
             save_jinja_template('../templates/error.html',
                                 output_path, TITLE=filename, ERROR=error_msg.replace('\n', '<p>'))

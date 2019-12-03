@@ -56,6 +56,37 @@ def open_observed_file(path=OBSERVED_PATH):
     webbrowser.open(resolve_url(path))
 
 
+def run_tcp_server(address, port, path, open_in_browser=True):
+    import http.server
+    import socketserver
+    os.chdir(path)
+    try_launch = True
+    max_tries = MAX_PORT_OPEN_ATTEMPTS
+    while try_launch:
+        try_launch = False
+        try:
+            Handler = http.server.SimpleHTTPRequestHandler
+            with socketserver.TCPServer((address, port), Handler) as httpd:
+                url = 'http://127.0.0.1:%s' % port
+                make_server_active(url)
+                print("serving '%s' at http://127.0.0.1:%s" %
+                        (path, port))
+                if open_in_browser:
+                    open_observed_file()
+                httpd.serve_forever(0.5)
+        except OSError:
+            if max_tries < 0:
+                print("Failed to find open port; exiting")
+            elif try_kill_listening_port(port):
+                try_launch = True
+            elif max_tries > 0:
+                print("Failed to launch at port %s, trying %s" %
+                        (port, port + 1))
+                port += 1
+                try_launch = True
+                max_tries -= 1
+
+
 def launch_server():
     if not os.path.exists('../build/assets'):
         extract_all_assets()
@@ -63,36 +94,6 @@ def launch_server():
 
     def launch_tcp_server(*args):
         from multiprocessing import Process
-
-        def run_tcp_server(address, port, path, open_in_browser=True):
-            import http.server
-            import socketserver
-            os.chdir(path)
-            try_launch = True
-            max_tries = MAX_PORT_OPEN_ATTEMPTS
-            while try_launch:
-                try_launch = False
-                try:
-                    Handler = http.server.SimpleHTTPRequestHandler
-                    with socketserver.TCPServer((address, port), Handler) as httpd:
-                        url = 'http://127.0.0.1:%s' % port
-                        make_server_active(url)
-                        print("serving '%s' at http://127.0.0.1:%s" %
-                              (path, port))
-                        if open_in_browser:
-                            open_observed_file()
-                        httpd.serve_forever(0.5)
-                except OSError:
-                    if max_tries < 0:
-                        print("Failed to find open port; exiting")
-                    elif try_kill_listening_port(port):
-                        try_launch = True
-                    elif max_tries > 0:
-                        print("Failed to launch at port %s, trying %s" %
-                              (port, port + 1))
-                        port += 1
-                        try_launch = True
-                        max_tries -= 1
 
         class ProcessLauncher:
             def __init__(self, target, *args):
