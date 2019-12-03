@@ -19,7 +19,7 @@
 - open bash + run: 
 
 ```bash
-    sudo apt install python3.8 npm
+    sudo apt install python3.8 python3-pip npm
     pip3 install watchdog PyYAML Jinja2
     npm install -g webpack-cli
     git clone https://github.com/seijiemery/dungeon-generator
