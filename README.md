@@ -9,8 +9,9 @@
 
 ## Dependencies:
 
-    npm (for webpack)
+    npm
     python 3.8.x
+    npm install -g webpack-cli
     pip3 install watchdog PyYAML Jinja2
 
 ## Overview:
