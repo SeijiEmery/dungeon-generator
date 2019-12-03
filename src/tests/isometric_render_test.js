@@ -1,4 +1,4 @@
-import { runPhaser, start } from '../core/setup_phaser'
+import { runPhaser, start } from '../core/run_phaser'
 import { ASSETS_BY_CATEGORY, DIRECTIONS } from '../generated/assets'
 
 const random = Math.random;
