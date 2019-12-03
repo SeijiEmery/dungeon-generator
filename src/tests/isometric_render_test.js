@@ -1,7 +1,7 @@
 import { runPhaser, start } from '../core/setup_phaser'
 import { ASSETS_BY_CATEGORY, DIRECTIONS } from '../generated/assets'
 
-const random = Math.random;
+const random = new Math.seedrandom("asdf");
 const randInt = (n) => (random() * n) | 0;
 const randIntRange = (n, m) => n + randInt(m - n);
 const randomArrayPick = (array) => array[randInt(array.length)];
