@@ -24,7 +24,7 @@ assets:
     - stone
 
   objects:
-    # - barrel
+    - barrel
     # - barrels
     # - barrelsStacked
     # - chair

@@ -1,4 +1,4 @@
-import { runPhaser, start } from '../core/setup_phaser'
+import { runPhaser, start } from '../core/run_phaser'
 import { ALL_ASSETS, DIRECTIONS } from '../generated/assets'
 
 start(() => {
