@@ -134,7 +134,7 @@ def run_observers():
 
             event_handlers = {
                 '../assets': (extract_all_assets, rebuild_assets),
-                '../config': (generate_config_js),
+                '../config': (generate_config_js, maybe_rebuild_phaser),
                 '../templates': (maybe_rebuild_phaser,),
                 '../tools': (relaunch_self,),
                 '../src': (maybe_rebuild_phaser,),
