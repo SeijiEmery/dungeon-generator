@@ -1,14 +1,7 @@
 import { runPhaser, start } from '../core/run_phaser'
-import { ASSETS_BY_CATEGORY, DIRECTIONS } from '../generated/assets'
+import { ASSETS_BY_CATEGORY } from '../generated/assets'
+import { random, randInt, randIntRange, randomTile } from '../core/random'
 
-const random = Math.random;
-const randInt = (n) => (random() * n) | 0;
-const randIntRange = (n, m) => n + randInt(m - n);
-const randomArrayPick = (array) => array[randInt(array.length)];
-const randomArrayPickOf = (array) => () => randomArrayPick(array);
-const randomDir = randomArrayPickOf(DIRECTIONS);
-const randomTile = (assets) =>
-    randomArrayPick(assets) + '_' + randomDir();
 
 start(() => {
     const tiles  = new Array();
