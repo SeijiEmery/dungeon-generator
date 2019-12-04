@@ -13,6 +13,11 @@ export function runPhaser (scene) {
         height: WINDOW_HEIGHT,
         scene: {
             preload: composeSequential(loadAllAssets, scene.preload),
+            init: composeSequential(function () {
+                // set camera zoom from config
+                this.camera = this.cameras.main;
+                this.camera.zoom = (config && config.camera && config.camera.zoom) || 1.0;
+            }, scene.init),
             ...scene
         }
     };
