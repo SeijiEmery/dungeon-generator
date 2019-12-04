@@ -1,8 +1,8 @@
-import { runPhaser, start } from '../core/setup_phaser'
+import { runPhaser, start } from '../core/run_phaser'
 
 start(() => {
     runPhaser({
-        init: function () {
+        create: function () {
             this.add.image(400, 300, "barrel_E");
         }
     });

@@ -1,6 +1,5 @@
 import { loadAllAssets } from '../generated/assets';
-import { runOnce, composeSequential } from './utils';
-
+import { composeSequential } from './utils'
 
 export function runPhaser (scene) {
     let initialized = false;
@@ -9,8 +8,7 @@ export function runPhaser (scene) {
         width: 800,
         height: 600,
         scene: {
-            preload: loadAllAssets,
-            update: composeSequential(runOnce(scene.init), scene.update),
+            preload: composeSequential(loadAllAssets, scene.preload),
             ...scene
         }
     };
