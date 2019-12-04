@@ -1,12 +1,16 @@
 import { loadAllAssets } from '../generated/assets';
 import { composeSequential } from './utils'
+import config from '../generated/config'
+
+export const WINDOW_WIDTH = config.window.width;
+export const WINDOW_HEIGHT = config.window.height;
 
 export function runPhaser (scene) {
     let initialized = false;
     let config = {
         type: Phaser.AUTO,
-        width: 800,
-        height: 600,
+        width: WINDOW_WIDTH,
+        height: WINDOW_HEIGHT,
         scene: {
             preload: composeSequential(loadAllAssets, scene.preload),
             ...scene

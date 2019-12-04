@@ -1,12 +1,14 @@
 import { runPhaser, start } from '../core/run_phaser'
 import { ASSETS_BY_CATEGORY } from '../generated/assets'
 import { random, randInt, randIntRange, randomTile } from '../core/random'
+import config from '../generated/config'
+
+const WIDTH = config.dungeon.width;
+const HEIGHT = config.dungeon.height;
 
 
 start(() => {
     const tiles  = new Array();
-    const WIDTH  = 50;
-    const HEIGHT = 50;
 
     const CENTER_X = 0;
     const CENTER_Y = 0;

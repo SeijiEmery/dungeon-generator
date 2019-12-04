@@ -114,12 +114,12 @@ def load_asset_pack(path):
     data = load_yaml(path)
     if 'asset_packs' in data:
         all_packs = {}
-        print("Found %d asset pack(s): %s"%(
+        print("Found %d asset pack(s): %s" % (
             len(data['asset_packs']),
             ', '.join(data['asset_packs'].keys())))
         for pack in data['asset_packs'].values():
             deep_update(all_packs, pack)
-            print("update: %s"%', '.join(all_packs['tiles'].keys()))
+            print("update: %s" % ', '.join(all_packs['tiles'].keys()))
         data = all_packs
     return data
 
