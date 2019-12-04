@@ -3,7 +3,9 @@ import watchdog
 import sys
 import os
 from extract_assets import extract_all_assets
-from rebuild_phaser_renderer import rebuild_phaser, generate_assets_js, generate_webpack_builds
+from rebuild_phaser_renderer import \
+    rebuild_phaser, generate_assets_js, generate_config_js, \
+    generate_webpack_builds
 from utils import load_yaml, write_yaml
 
 PORT = 5000
@@ -132,7 +134,7 @@ def run_observers():
 
             event_handlers = {
                 '../assets': (extract_all_assets, rebuild_assets),
-                '../config': (extract_all_assets, rebuild_assets),
+                '../config': (generate_config_js),
                 '../templates': (maybe_rebuild_phaser,),
                 '../tools': (relaunch_self,),
                 '../src': (maybe_rebuild_phaser,),
