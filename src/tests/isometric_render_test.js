@@ -1,4 +1,4 @@
-import { runPhaser, start } from '../core/setup_phaser'
+import { runPhaser, start } from '../core/run_phaser'
 import { ASSETS_BY_CATEGORY } from '../generated/assets'
 import { random, randInt, randIntRange, randomTile } from '../core/random'
 
