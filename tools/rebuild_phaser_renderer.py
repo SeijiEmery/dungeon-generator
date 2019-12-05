@@ -13,6 +13,7 @@ Example:
 """
 import os
 import subprocess
+import utils
 from utils import save_jinja_template, get_tile_assets, save_file, load_yaml
 import json
 
@@ -90,9 +91,11 @@ def generate_webpack_builds(entry_dir='../src/tests'):
                      builddir=os.path.abspath('../build')
                                      .replace('\\', '\\\\')))
 
+        print("webpack-cli --config {} --display=minimal".format(config_path))
         res = subprocess.run(
             "webpack-cli --config {} --display=minimal".format(config_path),
-            shell=True, capture_output=True)
+            shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        print(res)
         if res.returncode == 0:
             save_jinja_template('../templates/phaser_template.html',
                                 output_path,
