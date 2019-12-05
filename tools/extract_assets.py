@@ -17,7 +17,7 @@ Example:
 import os
 import re
 import yaml
-from utils import write_yaml, extract_zip
+from utils import write_yaml, extract_zip, load_yaml, save_file
 
 ASSETS_YAML_PATH = '../build/assets.yaml'
 ASSETS_DIR = '../build/assets'
@@ -77,6 +77,9 @@ def summarize_asset_pack(path, asset_pack_name, target_dir=ASSETS_DIR):
     Returns:
         (<asset-pack-name>, <dict-listing-all-sprite-assets-found>)
     """
+    asset_config = load_yaml('../assets/asset_config.yaml')
+    if 'prefix' in asset_config:
+        path = os.path.join(path, asset_config['prefix'])
     image_files = [
         os.path.join(root, file)
         for root, dirs, files in os.walk(path)
@@ -97,8 +100,8 @@ def summarize_asset_pack(path, asset_pack_name, target_dir=ASSETS_DIR):
             iso_tiles[name][direction] = path
 
     assets = {'tiles': iso_tiles}
-    with open(os.path.join(target_dir, asset_pack_name + '.yaml'), 'w') as f:
-        f.write(yaml.dump(assets))
+
+    write_yaml(os.path.join(target_dir, asset_pack_name + '.yaml'), assets)
     return asset_pack_name, assets
 
 
