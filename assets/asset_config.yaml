@@ -1,3 +1,7 @@
+
+# search in a prefix path within all asset packs.
+# values for kenney.nl iso packs: Isometric, Angle (top down)
+prefix: Isometric
 assets:
   walls:
     - stoneWall
