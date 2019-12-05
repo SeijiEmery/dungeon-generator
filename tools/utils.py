@@ -89,8 +89,10 @@ def save_file(path, data):
 
     basedir = os.path.split(path)[0]
     if not os.path.exists(basedir):
+        print("generating missing directories: '%s'" % basedir)
         os.makedirs(basedir)
 
+    print("saving '%s'" % path)
     with open(path, 'w') as f:
         f.write(data)
 
