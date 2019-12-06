@@ -14,10 +14,7 @@
     - install homebrew: http://brew.sh
     - install python + npm: `brew install npm python3`
 - Linux:
-    - install npm:
-        - apt for some incredibly stupid reason removed the npm package, so:
-        - https://linuxize.com/post/how-to-install-node-js-on-ubuntu-18.04/
-    - install python: `sudo apt install python3.7 python3-pip`
+    - install python + npm: `sudo apt update && sudo apt install npm python3.7 python3-pip`
 - Windows:
     - install WSL + follow the linux instructions
         - https://docs.microsoft.com/en-us/windows/wsl/install-win10
