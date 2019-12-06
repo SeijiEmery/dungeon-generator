@@ -1,5 +1,5 @@
 import vfs
-from simple_server import simple_http_server
+# from simple_server import simple_http_server
 from services import main, start_services
 from utils import merge_dicts
 import os
@@ -7,7 +7,7 @@ import os
 
 @main
 def run(*args, **kwargs):
-    server = simple_http_server(root='../build', url='localhost:5000')
+    # server = simple_http_server(root='../build', url='localhost:5000')
     vfs_ = vfs.create(workdir='.', cache='../build/vfs', actions=[
         vfs.each('../assets/*.zip', extract_assets)
            .accumulate(summarize_assets)
@@ -20,7 +20,8 @@ def run(*args, **kwargs):
                      srcdir='../src', ext='.js')
                  .then(server.open_in_web_browser))
     ])
-    start_services(vfs=vfs_, server=server).run(*args, **kwargs)
+    start_services(vfs=vfs_).run(*args, **kwargs)
+    # start_services(vfs=vfs_, server=server).run(*args, **kwargs)
 
 
 def extract_assets(zip_path):

@@ -8,6 +8,17 @@ from jinja2 import Template
 import os
 
 
+def merge_dicts(*dicts):
+    if len(dicts) == 0:
+        return {}
+    elif len(dicts) == 1:
+        return dicts[0]
+    d, dicts = dicts[0], dicts[1:]
+    for d2 in dicts:
+        deep_update(d, d2)
+    return d
+
+
 def extract_zip(path, target_dir):
     """ Extracts the contents of a .zip file from a zip file to a target dir.
 
