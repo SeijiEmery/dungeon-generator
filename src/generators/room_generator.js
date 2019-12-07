@@ -52,7 +52,7 @@ export function generate (params) {
             // This is in the top left, and could spawn in the bottom right
             x: randIntRange(partitions[i].x1 + 1,partitions[i].x2 - this.width - 1),
             y: randIntRange(partitions[i].y1 + 1,partitions[i].y2 - this.height - 1),
-            edges: new Array();
+            edges: [],
         };
     }
 
