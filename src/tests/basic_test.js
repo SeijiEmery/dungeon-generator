@@ -1,6 +1,6 @@
 import { start, runPhaser } from '../core/run_phaser'
 import { drawBasicGrid } from '../core/basic_renderer'
-import { graph_dungeon } from '../generators/room_generator'
+import { basic_dungeon } from '../generators/basic_generator'
 import { ASSETS_BY_CATEGORY } from '../generated/assets'
 import { dungeon } from '../generated/config'
 
@@ -11,9 +11,9 @@ start(() => {
         create: function() {
             // manually set dungeon size + camera zoom (override config...?)
             this.camera.zoom = 0.4;
-            dungeon.width = 40;
-            dungeon.height = 40;
-            let tiles = graph_dungeon(dungeon);
+            dungeon.width = 20;
+            dungeon.height = 20;
+            let tiles = basic_dungeon(dungeon);
             drawBasicGrid(this, {
                 grid: tiles,
                 spacing: 60,
