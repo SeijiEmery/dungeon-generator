@@ -49,10 +49,14 @@ export function graph_dungeon (params) {
             width: randInt(10),
             height: randInt(10),
             // This is in the top left, and could spawn in the bottom right
-            x: randIntRange(partitions[i].x1 + 1,partitions[i].x2 - width - 1),
-            y: randIntRange(partitions[i].y1 + 1,partitions[i].y2 - height - 1),
+            x: 0,
+            y: 0,
             edges: [],
         };
+
+        let r = rooms[i];
+        r.x = randIntRange(partitions[i].x1 + 1,partitions[i].x2 - width - 1);
+        r.y = randIntRange(partitions[i].y1 + 1,partitions[i].y2 - height - 1);
     }
 
     // Create graph alg here
