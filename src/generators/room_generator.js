@@ -3,7 +3,7 @@ import { randInt } from '../core/random'
 import { randIntRange } from '../core/random'
 
 
-export function generate (params) {
+export function graph_dungeon (params) {
     const { width, height } = params;
 
     // TODO: implement this
@@ -29,7 +29,7 @@ export function generate (params) {
     let numPartX = 3;
     for(let i = 0; i < numPartX; ++i){
         for(let j = 0; j < numPartY; ++j){
-            partitions[i + j] = {
+            partitions[i + j * numPartX] = {
                 x1: i,
                 y1: j,
                 x2: i+1,
@@ -39,10 +39,9 @@ export function generate (params) {
     }
 
     // Merge certain rooms
-    while(partitions.size() != numRooms){
+    /*while(partitions.size() != numRooms){
         let curr_part_node = randInt(partitions.size());
-    }
-
+    }*/
     // Pick random locations for room
     // replace with partitions
     for(let i = 0; i < numRooms; ++i){
@@ -50,8 +49,8 @@ export function generate (params) {
             width: randInt(10),
             height: randInt(10),
             // This is in the top left, and could spawn in the bottom right
-            x: randIntRange(partitions[i].x1 + 1,partitions[i].x2 - this.width - 1),
-            y: randIntRange(partitions[i].y1 + 1,partitions[i].y2 - this.height - 1),
+            x: randIntRange(partitions[i].x1 + 1,partitions[i].x2 - width - 1),
+            y: randIntRange(partitions[i].y1 + 1,partitions[i].y2 - height - 1),
             edges: [],
         };
     }
