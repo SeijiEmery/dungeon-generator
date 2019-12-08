@@ -42,8 +42,8 @@ export function graph_dungeon (params) {
     /*while(partitions.size() != numRooms){
         let curr_part_node = randInt(partitions.size());
     }*/
+
     // Pick random locations for room
-    // replace with partitions
     for(let i = 0; i < numRooms; ++i){
         rooms[i] = {
             width: randInt(10),
@@ -75,4 +75,39 @@ export function graph_dungeon (params) {
     // Pick end and start rooms
 
     return dungeon;
+}
+
+function create_bend (array, xOrigin, yOrigin, xroom1, yroom1, xroom2, yroom2){
+    create_tunnel(array, xOrigin, yOrigin, xroom1, yroom1);
+    create_tunnel(array, xOrigin, yOrigin, xroom2, yroom2);
+}
+
+function create_room (array, xOrigin, yOrigin,width,height) {
+    //console.log("room: (" + xOrigin + ", " + yOrigin + ") , (" + width + ", " + height + ")");
+    for(let i = xOrigin; i < xOrigin + width; ++i){
+        for(let j = yOrigin; j < yOrigin + height; ++j){
+            array.set(i,j,0);
+        }
+    }
+}
+
+// r = room
+function create_tunnel (array, xOrigin, yOrigin, xroom, yroom){
+    //console.log("tunnel: (" + xOrigin + ", " + yOrigin + ") , (" + xroom + ", " + yroom + ")");
+
+    let xtunnel = Math.min(xOrigin,xroom);
+    let ytunnel = Math.min(yOrigin,yroom);
+
+    let xwidth;
+    let yheight;
+    if(xOrigin != xroom){
+        xwidth = Math.abs(xOrigin - xroom + 1);
+        yheight = 1;
+    }
+    else{
+        xwidth = 1;
+        yheight = Math.abs(yOrigin - yroom + 1);
+    }
+    
+    create_room(array,xtunnel,ytunnel,xwidth,yheight);
 }

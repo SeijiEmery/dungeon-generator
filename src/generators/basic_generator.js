@@ -52,21 +52,19 @@ export function basic_dungeon (params) {
         let xmidRoom2 = Math.floor(rooms[i+1].xcoord + rooms[i+1].r_width/2);
         let ymidRoom2 = Math.floor(rooms[i+1].ycoord + rooms[i+1].r_height/2);
 
-        create_tunnel(dungeon, xtunnel, ytunnel, xmidRoom1, ymidRoom1);
-        create_tunnel(dungeon, xtunnel, ytunnel, xmidRoom2, ymidRoom2);
+        create_bend(dungeon, xtunnel, ytunnel, xmidRoom1, ymidRoom1, xmidRoom2, ymidRoom2);
     }
 
     return dungeon;
 }
 
+function create_bend (array, xOrigin, yOrigin, xroom1, yroom1, xroom2, yroom2){
+    create_tunnel(array, xOrigin, yOrigin, xroom1, yroom1);
+    create_tunnel(array, xOrigin, yOrigin, xroom2, yroom2);
+}
+
 function create_room (array, xOrigin, yOrigin,width,height) {
-    console.log("room: (" + xOrigin + ", " + yOrigin + ") , (" + width + ", " + height + ")");
-    /*array.fill((x,y) => {
-        if(xOrigin <= x && x < xOrigin + width && yOrigin <= y && y < yOrigin + height){
-            return 0;
-        }
-        return 1;
-    });*/
+    //console.log("room: (" + xOrigin + ", " + yOrigin + ") , (" + width + ", " + height + ")");
     for(let i = xOrigin; i < xOrigin + width; ++i){
         for(let j = yOrigin; j < yOrigin + height; ++j){
             array.set(i,j,0);
@@ -76,7 +74,7 @@ function create_room (array, xOrigin, yOrigin,width,height) {
 
 // r = room
 function create_tunnel (array, xOrigin, yOrigin, xroom, yroom){
-    console.log("tunnel: (" + xOrigin + ", " + yOrigin + ") , (" + xroom + ", " + yroom + ")");
+    //console.log("tunnel: (" + xOrigin + ", " + yOrigin + ") , (" + xroom + ", " + yroom + ")");
 
     let xtunnel = Math.min(xOrigin,xroom);
     let ytunnel = Math.min(yOrigin,yroom);
@@ -84,12 +82,12 @@ function create_tunnel (array, xOrigin, yOrigin, xroom, yroom){
     let xwidth;
     let yheight;
     if(xOrigin != xroom){
-        xwidth = Math.abs(xOrigin - xroom);
+        xwidth = Math.abs(xOrigin - xroom + 1);
         yheight = 1;
     }
     else{
         xwidth = 1;
-        yheight = Math.abs(yOrigin - yroom);
+        yheight = Math.abs(yOrigin - yroom + 1);
     }
     
     create_room(array,xtunnel,ytunnel,xwidth,yheight);
