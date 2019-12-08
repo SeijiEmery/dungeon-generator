@@ -4,7 +4,9 @@ import config from '../generated/config'
 
 export const WINDOW_WIDTH = config.window.width;
 export const WINDOW_HEIGHT = config.window.height;
-
+const SPEED = config.camera.speed;
+const CAM_ORIGIN = config.camera.origin;
+const CAM_WIDTH = config.camera.width;
 export function runPhaser (scene) {
     let initialized = false;
     let controls;
@@ -17,7 +19,7 @@ export function runPhaser (scene) {
             init: composeSequential(function () {
                 // set camera zoom from config
                 this.camera = this.cameras.main;
-                this.camera.setBounds(-2000,-2000,4000,4000); // (xpos,ypos,width,height), prob should be in config file
+                this.camera.setBounds(CAM_ORIGIN, CAM_ORIGIN,CAM_WIDTH,CAM_WIDTH); // (xpos,ypos,width,height),
                 this.camera.zoom = (config && config.camera && config.camera.zoom) || 1.0;
                 let cursors = this.input.keyboard.createCursorKeys();
                 let controlConfig = {
@@ -26,7 +28,7 @@ export function runPhaser (scene) {
                     right: cursors.right,
                     up: cursors.up,
                     down: cursors.down,
-                    speed: 1.0 //prob put this in config file
+                    speed: SPEED,
                 }
                 controls = new Phaser.Cameras.Controls.FixedKeyControl(controlConfig);
             }, scene.init),
