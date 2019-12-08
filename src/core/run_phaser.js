@@ -7,6 +7,7 @@ export const WINDOW_HEIGHT = config.window.height;
 
 export function runPhaser (scene) {
     let initialized = false;
+    let controls;
     let config = {
         type: Phaser.AUTO,
         width: WINDOW_WIDTH,
@@ -16,8 +17,22 @@ export function runPhaser (scene) {
             init: composeSequential(function () {
                 // set camera zoom from config
                 this.camera = this.cameras.main;
+                //this.camera.setBounds(0,0,2000,2000);
                 this.camera.zoom = (config && config.camera && config.camera.zoom) || 1.0;
+                let cursors = this.input.keyboard.createCursorKeys();
+                let controlConfig = {
+                    camera: this.camera,
+                    left: cursors.left,
+                    right: cursors.right,
+                    up: cursors.up,
+                    down: cursors.down,
+                    speed: 1.0 //prob put this in config file
+                }
+                controls = new Phaser.Cameras.Controls.FixedKeyControl(controlConfig);
             }, scene.init),
+            update: composeSequential(function (time, delta) {
+                controls.update(delta);
+            }, scene.update),
             ...scene
         }
     };
