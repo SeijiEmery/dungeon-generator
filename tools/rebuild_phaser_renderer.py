@@ -23,6 +23,16 @@ INDENT_4 = ' ' * 4
 INDENT_8 = ' ' * 8
 
 
+def needs_update(path):
+    if type(path) == list:
+        paths = path
+        for path in paths:
+            if needs_update(path):
+                return True
+        return False
+    return not os.path.exists(path) or file_changed(path)
+
+
 def generate_assets_js():
     SRC_PATHS = [
         '../assets/asset_config.yaml',
@@ -32,10 +42,7 @@ def generate_assets_js():
         if file.endswith('.zip')
     ]
     TARGET_PATH = '../src/generated/assets.js'
-    if not any([
-        not os.path.exists(path) or
-        file_changed(path) for path in SRC_PATHS
-    ]):
+    if needs_update(SRC_PATHS):
         print("skipping rebuild of %s" % TARGET_PATH)
 
     tiles, asset_list = get_tile_assets('../build/assets.yaml')
@@ -83,8 +90,13 @@ def generate_assets_js():
 
 
 def generate_config_js():
-    config = load_yaml('../config/config.yaml')
-    save_file('../src/generated/config.json', json.dumps(config))
+    SRC_FILE = '../config/config.yaml'
+    TARGET_FILE = '../src/generated/config.json'
+    if needs_update(SRC_FILE):
+        config = load_yaml(SRC_FILE)
+        save_file(TARGET_FILE, json.dumps(config))
+    else:
+        print("skipping generation of %s" % TARGET_FILE)
 
 
 def generate_webpack_builds(entry_dir='../src/tests'):
