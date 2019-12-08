@@ -21,28 +21,13 @@ export function graph_dungeon (params) {
     // Populate partitions rooms
     let partitions = [];
     partition_rooms(partitions,0,0,width,height,numRooms);
-    /*for(let i = 0; i < numPartX; ++i){
-        for(let j = 0; j < numPartY; ++j){
-            partitions[i + j * numPartX] = {
-                x1: i,
-                y1: j,
-                x2: i+1,
-                y2: j+1,
-            }
-        }
-    }*/
-
-    // Merge certain rooms
-    /*while(partitions.size() != numRooms){
-        let curr_part_node = randInt(partitions.size());
-    }*/
     console.log(partitions);
 
     // Pick random locations for room
     for(let i = 0; i < numRooms; ++i){
         rooms[i] = {
-            width: randInt(10),
-            height: randInt(10),
+            width: 1,
+            height: 1,
             // This is in the top left, and could spawn in the bottom right
             x: 0,
             y: 0,
@@ -51,8 +36,11 @@ export function graph_dungeon (params) {
         };
 
         let r = rooms[i];
-        r.x = randIntRange(partitions[i].x1 + 1,partitions[i].x2 - width - 1);
-        r.y = randIntRange(partitions[i].y1 + 1,partitions[i].y2 - height - 1);
+        let p = partitions[i];
+        r.width = randIntRange(1,Math.abs(p.x1-p.x2)-1);
+        r.height = randIntRange(1,Math.abs(p.y1-p.y2)-1);
+        r.x = randIntRange(p.x1 + 1,p.x2 - width - 1);
+        r.y = randIntRange(p.y1 + 1,p.y2 - height - 1);
     }
 
     // Create graph alg here
@@ -75,15 +63,29 @@ export function graph_dungeon (params) {
     }
 
     // Pick connections
-    /*for(let i = 0; i < numRooms; ++i){
-        let totalEdges = rooms[i].edges.length;
+    for(let i = 0; i < numRooms; ++i){
+        let r = rooms[i];
+
+        let totalEdges = r.edges.length;
         let numTunnels = randIntRange(1,totalEdges);
-        let tempArr = rooms[i].edges.slice(0);
+        let tempArr = r.edges.slice(0);
+
+        console.log("temp = " + tempArr);
 
         for(let j = 0; j < totalEdges; ++j){
+            let chosenEdge = randInt(tempArr.length);
 
+            r.tunnels.push(tempArr[chosenEdge]);
+
+            tempArr[chosenEdge] = tempArr[tempArr.length];
+
+            tempArr.pop();
         }
-    }*/
+
+        console.log("old edges = " + r.edges);
+        console.log("new temp = " + tempArr);
+        console.log("new tunnels = " + r.tunnels);
+    }
 
     // Dig tunnels
 
@@ -178,7 +180,7 @@ function partition_rooms(array, X0,Y0,X,Y,ROOMS){
     if(ROOMS % 2 == 1){
         var split = Math.floor(Y/2);
         partition_rooms(array, X0,Y0,X,split,part1);
-        partition_rooms(array, X,split,X,Y,part2);
+        partition_rooms(array, X0,split,X,Y,part2);
         return;
     }
 }
