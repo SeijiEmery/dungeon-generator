@@ -8,11 +8,6 @@ export function graph_dungeon (params) {
 
     // TODO: implement this
 
-    /*let array = new Array2d(width, height);
-    array.fill((i, j) => {
-        return randInt(2);
-    });*/
-
     let rooms = [];
     let numRooms = 5;
 
@@ -25,9 +20,8 @@ export function graph_dungeon (params) {
     // Multiply each coord by some multiplier
     // Populate partitions rooms
     let partitions = [];
-    let numPartY = 3;
-    let numPartX = 3;
-    for(let i = 0; i < numPartX; ++i){
+    partition_rooms(partitions,0,0,width,height,numRooms);
+    /*for(let i = 0; i < numPartX; ++i){
         for(let j = 0; j < numPartY; ++j){
             partitions[i + j * numPartX] = {
                 x1: i,
@@ -36,12 +30,13 @@ export function graph_dungeon (params) {
                 y2: j+1,
             }
         }
-    }
+    }*/
 
     // Merge certain rooms
     /*while(partitions.size() != numRooms){
         let curr_part_node = randInt(partitions.size());
     }*/
+    console.log(partitions);
 
     // Pick random locations for room
     for(let i = 0; i < numRooms; ++i){
@@ -52,6 +47,7 @@ export function graph_dungeon (params) {
             x: 0,
             y: 0,
             edges: [],
+            tunnels: [],
         };
 
         let r = rooms[i];
@@ -60,15 +56,34 @@ export function graph_dungeon (params) {
     }
 
     // Create graph alg here
-
+    for(let i = 0; i < numRooms; ++i){
+        for(let j = i + 1; j < numRooms; ++j){
+            if(partitions[i].x1 === partitions[j].x2 ||
+               partitions[i].y1 === partitions[j].y2 ||
+               partitions[i].y2 === partitions[j].y1 ||
+               partitions[i].y2 === partitions[j].y1
+               ){
+                rooms[i].edges.push(j);
+                rooms[j].edges.push(i);
+            }
+        }
+    }
     // expand room alg here
-    // determine dimensions
-    // maybe overlap rooms?
+    for(let i = 0; i < numRooms; ++i){
+        let r = rooms[i];
+        create_room(dungeon,r.x,r.y,r.width,r.height);
+    }
 
     // Pick connections
-    for(let i = 0; i < numRooms; ++i){
-        
-    }
+    /*for(let i = 0; i < numRooms; ++i){
+        let totalEdges = rooms[i].edges.length;
+        let numTunnels = randIntRange(1,totalEdges);
+        let tempArr = rooms[i].edges.slice(0);
+
+        for(let j = 0; j < totalEdges; ++j){
+
+        }
+    }*/
 
     // Dig tunnels
 
@@ -121,4 +136,49 @@ function create_tunnel (array, xOrigin, yOrigin, xroom, yroom){
     }
     
     create_room(array,xtunnel,ytunnel,xwidth,yheight);
+}
+
+/*function partition_merge_recursive (numRooms, x1, y1, x2, y2, orientation){
+    let partitions = [];
+
+    if(numRooms === 1){
+        let cell = {
+            x1: ,
+            y1: ,
+            x2: ,
+            y2: ,
+        }
+    }
+}*/
+
+function partition_rooms(array, X0,Y0,X,Y,ROOMS){
+    if(ROOMS == 0){
+        // Probably not possible
+        return;
+    }
+    if(ROOMS == 1){
+        let cell = {
+            x1: X0,
+            y1: Y0,
+            x2: X,
+            y2: Y,
+        }
+        array.push(cell);
+        return;
+    }
+    var part1 = Math.floor(ROOMS/2);
+    var part2 = ROOMS - part1;
+
+    if(ROOMS % 2 == 0){
+        var split = Math.floor(X/2);
+        partition_rooms(array, X0,Y0,split,Y,part1);
+        partition_rooms(array, split,Y0,X,Y,part2)
+        return;
+    }
+    if(ROOMS % 2 == 1){
+        var split = Math.floor(Y/2);
+        partition_rooms(array, X0,Y0,X,split,part1);
+        partition_rooms(array, X,split,X,Y,part2);
+        return;
+    }
 }
