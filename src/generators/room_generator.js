@@ -40,8 +40,8 @@ export function graph_dungeon (params) {
         let p = partitions[i];
         r.width = randIntRange(1,Math.abs(p.x1-p.x2)-1);
         r.height = randIntRange(1,Math.abs(p.y1-p.y2)-1);
-        r.x = randIntRange(p.x1 + 1,p.x2 - width - 1);
-        r.y = randIntRange(p.y1 + 1,p.y2 - height - 1);
+        r.x = randIntRange(p.x1 + 1,p.x2 - r.width - 1);
+        r.y = randIntRange(p.y1 + 1,p.y2 - r.height - 1);
     }
 
     // Create graph alg here
@@ -88,8 +88,8 @@ export function graph_dungeon (params) {
         let totalEdges = Math.max(1, tempArr.length - 1);
         let numTunnels = randIntRange(0,totalEdges);
 
-        console.log("semi temp = " + tempArr);
-        console.log("semi tunnels = " + r.tunnels);
+        //console.log("semi temp = " + tempArr);
+        //console.log("semi tunnels = " + r.tunnels);
 
         // Pick new tunnels
         for(let j = 0; j < numTunnels; ++j){
@@ -109,16 +109,83 @@ export function graph_dungeon (params) {
             //console.log("   3in progress temp = " + tempArr);
         }
 
-        console.log("old edges = " + r.edges);
-        console.log("new temp = " + tempArr);
+        //console.log("old edges = " + r.edges);
+        //console.log("new temp = " + tempArr);
         console.log("new tunnels = " + r.tunnels);
     }
 
+    console.log("Before DFS");
+    for(let i = 0; i < numRooms; ++i){
+        console.log(i + " edges: " + rooms[i].edges);
+        console.log(i + " tunnels: " + rooms[i].tunnels);
+    }
+
+    // Check for completion
+    while(true){
+        // Run dfs
+        let dfs_result = dfs(rooms, numRooms);
+        console.log(dfs_result);
+
+        // Log which rooms were unvisited in dfs
+        let incomplete = [];
+        for(let i = 0; i < numRooms; ++i){
+            if(dfs_result[i] === false){
+                incomplete.push(i);
+                break;
+            }
+        }
+
+        // If all rooms are visited, then exit
+        if(incomplete.length === 0){
+            break;
+        }
+        // else, carve a new tunnel and try again
+        carve_new_tunnel(incomplete, rooms, dfs_result);
+    }
+
+    console.log("After DFS");
+    for(let i = 0; i < numRooms; ++i){
+        console.log(i + " edges: " + rooms[i].edges);
+        console.log(i + " tunnels: " + rooms[i].tunnels);
+    }
+
     // Dig tunnels
+    for(let i = 0; i < numRooms; ++i){
+        let t = rooms[i].tunnels;
+        for(let j = 0; j < t.length; ++j){
+            // any index t[j] is less than i has already been dug
+            if(i < t[j]){
+                let xmidRoom1 = Math.floor(rooms[i].x + rooms[i].width/2);
+                let ymidRoom1 = Math.floor(rooms[i].y + rooms[i].height/2);
+                let xmidRoom2 = Math.floor(rooms[t[j]].x + rooms[t[j]].width/2);
+                let ymidRoom2 = Math.floor(rooms[t[j]].y + rooms[t[j]].height/2);
+                create_bend(dungeon, xmidRoom1, ymidRoom1, xmidRoom2, ymidRoom2);
+            }
+        }
+    }
 
     // Pick end and start rooms
 
     return dungeon;
+}
+
+function carve_new_tunnel(incomplete, rooms, dfs_result) {
+    // Iterate through all rooms that are disconnected
+    for(let i = 0; i < incomplete.length; ++i){
+        // Iterate through a room's edges
+        // incomplete[i] returns a rooms index
+        let r = rooms[incomplete[i]];
+        let e = r.edges;
+        // e[j] returns a room's index
+        for(let j = 0; j < e.length; ++j){
+            // If this is unvisited and j is visited...
+            if(dfs_result[e[j]] === true){
+                r.tunnels.push(e[j]);
+                rooms[j].tunnels.push(incomplete[i]);
+                return;
+            }
+        }
+    }
 }
 
 function create_bend (array, xroom1, yroom1, xroom2, yroom2){
@@ -167,22 +234,28 @@ function create_tunnel (array, xOrigin, yOrigin, xroom, yroom){
     create_room(array,xtunnel,ytunnel,xwidth,yheight);
 }
 
-/*function partition_merge_recursive (numRooms, x1, y1, x2, y2, orientation){
-    let partitions = [];
-
-    if(numRooms === 1){
-        let cell = {
-            x1: ,
-            y1: ,
-            x2: ,
-            y2: ,
-        }
-    }
-}*/
-
 function delete_arr_elem(array,position){
     array[position] = array[array.length - 1];
     array.pop();
+}
+
+function dfs(rooms, numRooms){
+    let visited = [];
+    for(let i = 0; i < numRooms; ++i)
+        visited[i] = false;
+    dfs_recursive(rooms, visited, 0);
+
+    return visited;
+}
+
+function dfs_recursive(rooms, visited, position){
+    visited[position] = true;
+    let t = rooms[position].tunnels;
+    for(let i = 0; i < t.length; ++i){
+        if(visited[t[i]] === false){
+            dfs_recursive(rooms, visited, t[i]);
+        }
+    }
 }
 
 function partition_rooms(array, X0,Y0,X,Y,ROOMS){

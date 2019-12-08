@@ -8,7 +8,7 @@ dungeon:
 
 random:
   seed: 8ae8865c461f77fd321851c830f8bbeb49df254d
-  useFixedSeed: true
+  useFixedSeed: false
 
 camera:
   zoom: 0.4
