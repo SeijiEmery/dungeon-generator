@@ -20,30 +20,51 @@ export function basic_dungeon (params) {
     // Create the rooms
     for(let i = 0; i < numRooms; ++i){
         rooms[i] = {
-            r_width: randIntRange(4,8),
-            r_height: randIntRange(4,8),
-            xcoord: 0,
-            ycoord: 0,
+            width: randIntRange(4,8),
+            height: randIntRange(4,8),
+            x: 0,
+            y: 0,
         }
 
         let r = rooms[i];
 
-        r.xcoord = randIntRange(1,width-r.r_width-1);
-        r.ycoord = randIntRange(1,height-r.r_height-1);
+        r.x = randIntRange(1,width-r.width-1);
+        r.y = randIntRange(1,height-r.height-1);
 
-        create_room(dungeon, r.xcoord, r.ycoord, r.r_width, r.r_height);
+        create_room(dungeon, r.x, r.y, r.width, r.height);
     }
 
     // Create the tunnels
     for(let i = 0; i < numRooms - 1; ++i){
-        let xmidRoom1 = Math.floor(rooms[i].xcoord + rooms[i].r_width/2);
-        let ymidRoom1 = Math.floor(rooms[i].ycoord + rooms[i].r_height/2);
-        let xmidRoom2 = Math.floor(rooms[i+1].xcoord + rooms[i+1].r_width/2);
-        let ymidRoom2 = Math.floor(rooms[i+1].ycoord + rooms[i+1].r_height/2);
+        let xmidRoom1 = Math.floor(rooms[i].x + rooms[i].width/2);
+        let ymidRoom1 = Math.floor(rooms[i].y + rooms[i].height/2);
+        let xmidRoom2 = Math.floor(rooms[i+1].x + rooms[i+1].width/2);
+        let ymidRoom2 = Math.floor(rooms[i+1].y + rooms[i+1].height/2);
 
         create_bend(dungeon, xmidRoom1, ymidRoom1, xmidRoom2, ymidRoom2);
     }
 
+    let start = {
+        x: 0,
+        y: 0,
+    }
+
+    let end = {
+        x: 0,
+        y: 0,
+    }
+
+    start.x = rooms[0].x + randInt(rooms[0].width);
+    start.y = rooms[0].y + randInt(rooms[0].height);
+
+    end.x = rooms[numRooms-1].x + randInt(rooms[numRooms-1].width);
+    end.y = rooms[numRooms-1].y + randInt(rooms[numRooms-1].height);
+
+    /*return {
+        dungeon: dungeon,
+        start: start,
+        end: end,
+    };*/
     return dungeon;
 }
 

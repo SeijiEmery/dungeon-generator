@@ -77,9 +77,20 @@ export function graph_dungeon (params) {
     return dungeon;
 }
 
-function create_bend (array, xOrigin, yOrigin, xroom1, yroom1, xroom2, yroom2){
-    create_tunnel(array, xOrigin, yOrigin, xroom1, yroom1);
-    create_tunnel(array, xOrigin, yOrigin, xroom2, yroom2);
+function create_bend (array, xroom1, yroom1, xroom2, yroom2){
+    let xtunnel;
+    let ytunnel;
+    if(randInt(1) == 0){
+        xtunnel = Math.floor(xroom1);
+        ytunnel = Math.floor(yroom2);
+    }
+    else{
+        xtunnel = Math.floor(xroom2);
+        ytunnel = Math.floor(yroom1);
+    }
+
+    create_tunnel(array, xtunnel, ytunnel, xroom1, yroom1);
+    create_tunnel(array, xtunnel, ytunnel, xroom2, yroom2);
 }
 
 function create_room (array, xOrigin, yOrigin,width,height) {
