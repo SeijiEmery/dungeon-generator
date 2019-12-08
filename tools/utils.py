@@ -6,6 +6,9 @@ import zipfile
 import yaml
 from jinja2 import Template
 import os
+from fscache import FileScanner
+
+fscache = FileScanner()
 
 
 def extract_zip(path, target_dir):
@@ -80,8 +83,9 @@ def load_yaml(path):
 
 def load_file(path):
     """ Convenience function to load a text file + call <file>.read() """
-    with open(path, 'r') as f:
-        return f.read()
+    # with open(path, 'r') as f:
+    #     return f.read()
+    return fscache.load_file(path)
 
 
 def save_file(path, data):
@@ -93,8 +97,9 @@ def save_file(path, data):
         os.makedirs(basedir)
 
     print("saving '%s'" % path)
-    with open(path, 'w') as f:
-        f.write(data)
+    fscache.save_file(path, data)
+    # with open(path, 'w') as f:
+    #     f.write(data)
 
 
 def save_jinja_template(template_html, output_html, *args, **kwargs):
