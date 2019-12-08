@@ -47,14 +47,19 @@ export function graph_dungeon (params) {
     // Create graph alg here
     for(let i = 0; i < numRooms; ++i){
         for(let j = i + 1; j < numRooms; ++j){
+            //console.log("now checking " + i + " and " + j);
             if(partitions[i].x1 === partitions[j].x2 ||
                partitions[i].y1 === partitions[j].y2 ||
-               partitions[i].y2 === partitions[j].y1 ||
+               partitions[i].x2 === partitions[j].x1 ||
                partitions[i].y2 === partitions[j].y1
                ){
                 rooms[i].edges.push(j);
                 rooms[j].edges.push(i);
+
+                //console.log("rooms[" + i + "] " + rooms[i].edges);
+                //console.log("rooms[" + j + "] " + rooms[j].edges);
             }
+            //console.log("[[[[[[[[[[[[[[[[[[[");
         }
     }
     // expand room alg here
@@ -67,20 +72,45 @@ export function graph_dungeon (params) {
     for(let i = 0; i < numRooms; ++i){
         let r = rooms[i];
 
-        let totalEdges = r.edges.length;
-        let numTunnels = randIntRange(1,totalEdges);
         let tempArr = r.edges.slice(0);
 
-        console.log("temp = " + tempArr);
+        console.log("//////////////////");
+        console.log("checking " + i);
+        //console.log("old temp = " + tempArr);
+        //console.log("old tunnels = " + r.tunnels);
 
-        for(let j = 0; j < totalEdges; ++j){
-            let chosenEdge = randInt(tempArr.length);
+        // Only consider new tunnels
+        // Trim current tunnels out of possible candidates
+        for(let i = 0; i < r.tunnels.length; ++i){
+            for(let j = 0; j < tempArr.length; ++j){
+                if(r.tunnels[i] === tempArr[j]){
+                    delete_arr_elem(tempArr,j);
+                }
+            }
+        }
 
-            r.tunnels.push(tempArr[chosenEdge]);
+        let totalEdges = Math.max(1, tempArr.length - 1);
+        let numTunnels = randIntRange(1,totalEdges);
 
-            tempArr[chosenEdge] = tempArr[tempArr.length];
+        console.log("semi temp = " + tempArr);
+        console.log("semi tunnels = " + r.tunnels);
 
-            tempArr.pop();
+        // Pick new tunnels
+        for(let j = 0; j < numTunnels; ++j){
+            //console.log("   in progress temp = " + tempArr);
+
+            let chosenIndex = randInt(tempArr.length-1);
+            let chosenValue = tempArr[chosenIndex];
+
+            //console.log("   chosenIndex = " + chosenIndex);
+            //console.log("   chosenValue = " + chosenValue);
+
+            r.tunnels.push(chosenValue);
+            rooms[chosenValue].tunnels.push(i);
+
+            //console.log("   1in progress temp = " + tempArr);
+            delete_arr_elem(tempArr,chosenIndex);
+            //console.log("   3in progress temp = " + tempArr);
         }
 
         console.log("old edges = " + r.edges);
@@ -153,6 +183,11 @@ function create_tunnel (array, xOrigin, yOrigin, xroom, yroom){
         }
     }
 }*/
+
+function delete_arr_elem(array,position){
+    array[position] = array[array.length - 1];
+    array.pop();
+}
 
 function partition_rooms(array, X0,Y0,X,Y,ROOMS){
     if(ROOMS == 0){
