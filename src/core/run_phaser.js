@@ -28,6 +28,8 @@ export function runPhaser (scene) {
                     right: cursors.right,
                     up: cursors.up,
                     down: cursors.down,
+                    zoomIn: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q),
+                    zoomOut: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E),
                     speed: SPEED,
                 }
                 controls = new Phaser.Cameras.Controls.FixedKeyControl(controlConfig);
