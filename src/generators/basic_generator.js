@@ -36,31 +36,31 @@ export function basic_dungeon (params) {
 
     // Create the tunnels
     for(let i = 0; i < numRooms - 1; ++i){
-        let xtunnel;
-        let ytunnel;
-        if(randInt(1) == 0){
-            xtunnel = Math.floor(rooms[i].xcoord + rooms[i].r_width/2);
-            ytunnel = Math.floor(rooms[i+1].ycoord + rooms[i+1].r_height/2);
-        }
-        else{
-            xtunnel = Math.floor(rooms[i+1].xcoord + rooms[i+1].r_width/2);
-            ytunnel = Math.floor(rooms[i].ycoord + rooms[i].r_height/2);
-        }        
-
         let xmidRoom1 = Math.floor(rooms[i].xcoord + rooms[i].r_width/2);
         let ymidRoom1 = Math.floor(rooms[i].ycoord + rooms[i].r_height/2);
         let xmidRoom2 = Math.floor(rooms[i+1].xcoord + rooms[i+1].r_width/2);
         let ymidRoom2 = Math.floor(rooms[i+1].ycoord + rooms[i+1].r_height/2);
 
-        create_bend(dungeon, xtunnel, ytunnel, xmidRoom1, ymidRoom1, xmidRoom2, ymidRoom2);
+        create_bend(dungeon, xmidRoom1, ymidRoom1, xmidRoom2, ymidRoom2);
     }
 
     return dungeon;
 }
 
-function create_bend (array, xOrigin, yOrigin, xroom1, yroom1, xroom2, yroom2){
-    create_tunnel(array, xOrigin, yOrigin, xroom1, yroom1);
-    create_tunnel(array, xOrigin, yOrigin, xroom2, yroom2);
+function create_bend (array, xroom1, yroom1, xroom2, yroom2){
+    let xtunnel;
+    let ytunnel;
+    if(randInt(1) == 0){
+        xtunnel = Math.floor(xroom1);
+        ytunnel = Math.floor(yroom2);
+    }
+    else{
+        xtunnel = Math.floor(xroom2);
+        ytunnel = Math.floor(yroom1);
+    }
+
+    create_tunnel(array, xtunnel, ytunnel, xroom1, yroom1);
+    create_tunnel(array, xtunnel, ytunnel, xroom2, yroom2);
 }
 
 function create_room (array, xOrigin, yOrigin,width,height) {
