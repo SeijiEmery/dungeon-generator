@@ -13,12 +13,13 @@ def run(*args, **kwargs):
            .accumulate(summarize_assets)
            .then(generate_assets_js),
         vfs.each('../config/*.yaml', generate_config),
-        vfs.scan_js_deps('../src/', ext='.js'),
+        # vfs.scan_js_deps('../src/', ext='.js'),
         vfs.each('../src/tests/*.js',
                  vfs.with_all_js_imports(
                      generate_html_and_js_for_entrypoint,
                      srcdir='../src', ext='.js')
-                 .then(server.open_in_web_browser))
+                 # .then(server.open_in_web_browser)
+                 )
     ])
     start_services(vfs=vfs_).run(*args, **kwargs)
     # start_services(vfs=vfs_, server=server).run(*args, **kwargs)

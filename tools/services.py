@@ -14,11 +14,23 @@ class Main:
 main = Main()
 
 
-def start_services(services):
-    if len(services) == 1:
-        services[0]()
-    elif len(services) > 0:
-        pass
+class Runner:
+    def __init__(self, fcn):
+        self.fcn = fcn
+
+    def run(self, *args, **kwargs):
+        self.fcn(*args, **kwargs)
+
+
+def start_services(**services):
+    services = list(services.values())
+
+    def run(*args, **kwargs):
+        if len(services) == 1:
+            services[0].run()
+        elif len(services) > 0:
+            pass
+    return Runner(run)
 
 
 if __name__ == '__main__':
