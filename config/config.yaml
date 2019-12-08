@@ -3,8 +3,8 @@ window:
   height: 600
 
 dungeon:
-  width: 30
-  height: 30
+  width: 10
+  height: 10
 
 random:
   seed: 8ae8865c461f77fd321851c830f8bbeb49df254d

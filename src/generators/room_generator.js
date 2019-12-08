@@ -19,7 +19,7 @@ export function graph_dungeon (params) {
     let dungeon = new Array2d(width,height);
 
     dungeon.fill((x,y) => {
-        return 1;
+        return (x+y+1) % 2;
     });
 
     // Multiply each coord by some multiplier
@@ -34,6 +34,7 @@ export function graph_dungeon (params) {
                 y1: j,
                 x2: i+1,
                 y2: j+1,
+
             }
         }
     }

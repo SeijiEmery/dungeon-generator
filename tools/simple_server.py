@@ -93,7 +93,7 @@ def run_tcp_server(address, port, path, open_in_browser=True):
 def launch_server():
     if not os.path.exists('../build/assets'):
         extract_all_assets()
-    rebuild_phaser()
+    # rebuild_phaser()
 
     def launch_tcp_server(*args):
         from multiprocessing import Process
@@ -112,8 +112,122 @@ def launch_server():
         return ProcessLauncher(run_tcp_server, *args)
 
     with launch_tcp_server(*SERVER_ADDRESS, '../build'):
-        run_observers()
+        try:
+            run_file_watchers()
+        except Exception as e:
+            print(e)
+            sys.exit(-1)
 
+
+def run_file_watchers():
+    from watchdog.utils.dirsnapshot import DirectorySnapshot, DirectorySnapshotDiff
+
+    # rebuild_assets()
+    # generate_assets_js()
+    # generate_config_js()
+    # generate_webpack_builds()
+    # open_observed_file()
+
+    def make_snapshots():
+        return {
+            'assets': DirectorySnapshot('../assets', recursive=False),
+            'build': DirectorySnapshot('../build', recursive=False),
+            'config': DirectorySnapshot('../config', recursive=True),
+            'templates': DirectorySnapshot('../templates', recursive=True),
+            'src': DirectorySnapshot('../src', recursive=True),
+            'tools': DirectorySnapshot('../tools', recursive=False),
+        }
+
+    def update_snapshots(snapshots):
+        new_snapshots = make_snapshots()
+        return new_snapshots, {
+            key: DirectorySnapshotDiff(snapshots[key], new_snapshots[key])
+            for key in snapshots.keys()
+        }
+
+    snapshots = make_snapshots()
+    print(snapshots)
+    changes = []
+    while True:
+        time.sleep(0.5)
+        changes.clear()
+        snapshots, all_changes = update_snapshots(snapshots)
+        for prefix, events in all_changes.items():
+            if events.dirs_created:
+                for path in events.dirs_created:
+                    changes.append((prefix, 'created', path, True))
+            if events.dirs_modified:
+                for path in events.dirs_modified:
+                    changes.append((prefix, 'created', path, True))
+            if events.dirs_deleted:
+                for path in events.dirs_deleted:
+                    changes.append((prefix, 'created', path, True))
+            if events.dirs_moved:
+                for (from_file, to_file) in events.dirs_moved:
+                    changes.append((prefix, 'moved', (from_file, to_file), True))
+            if events.files_created:
+                for path in events.files_created:
+                    changes.append((prefix, 'created', path, False))
+            if events.files_modified:
+                for path in events.files_modified:
+                    changes.append((prefix, 'created', path, False))
+            if events.files_deleted:
+                for path in events.files_deleted:
+                    changes.append((prefix, 'created', path, False))
+            if events.files_moved:
+                for (from_file, to_file) in events.files_moved:
+                    changes.append((prefix, 'moved', (from_file, to_file), False))
+
+        def handle_asset_change(action, path, is_dir):
+            if 'asset_config.yaml' in path:
+                print('rebuilding asset_config.yaml -> ...')
+                generate_assets_js()
+            else:
+                rebuild_assets()
+
+        def handle_config_change(action, path, is_dir):
+            if 'config.yaml' in path:
+                print('rebuilding config.yaml -> ...')
+                generate_config_js()
+
+        def handle_js_change(action, path, is_dir):
+            if path.startswith('../src/generated'):
+                return
+            rebuild_phaser()
+
+        def handle_template_html_change(action, path, is_dir):
+            if path.endswith('.html'):
+                print('rebuilding asset_config.yaml -> ...')
+                rebuild_phaser()
+
+        def handle_py_change(action, path, is_dir):
+            pass
+
+        rebuild_detected = False
+
+        def handle_build_change(action, path, is_dir):
+            nonlocal rebuild_detected
+            base, file = os.path.split(path)
+            if base == '../build' and (file.endswith('.js') or file.endswith('.html')):
+                rebuild_detected = True
+                print('rebuilt %s' % path)
+
+        handlers = {
+            'assets': handle_asset_change,
+            'config': handle_config_change,
+            'src': handle_js_change,
+            'tools': handle_py_change,
+            'templates': handle_template_html_change,
+            'build': handle_build_change,
+        }
+        for prefix, action, path, is_dir in changes:
+            if prefix in handlers:
+                handlers[prefix](action, path, is_dir)
+            else:
+                print("unhandled prefix: '%s'" % prefix)
+
+        if rebuild_detected:
+            open_observed_file()
 
 def run_observers():
     from watchdog.observers import Observer
