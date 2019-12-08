@@ -102,6 +102,10 @@ def save_file(path, data):
     #     f.write(data)
 
 
+def file_changed(path):
+    return fscache.changed(path)
+
+
 def save_jinja_template(template_html, output_html, *args, **kwargs):
     template = Template(load_file(template_html))
     save_file(output_html, template.render(*args, **kwargs))

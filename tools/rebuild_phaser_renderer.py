@@ -13,9 +13,10 @@ Example:
 """
 import os
 import subprocess
-import utils
-from utils import save_jinja_template, get_tile_assets, save_file, load_yaml
+from utils import save_jinja_template, get_tile_assets, save_file, load_yaml,\
+    file_changed
 import json
+
 
 ROOT_DIR = '.'
 INDENT_4 = ' ' * 4
@@ -23,6 +24,20 @@ INDENT_8 = ' ' * 8
 
 
 def generate_assets_js():
+    SRC_PATHS = [
+        '../assets/asset_config.yaml',
+    ] + [
+        os.path.join('../assets', file)
+        for file in os.listdir('../assets')
+        if file.endswith('.zip')
+    ]
+    TARGET_PATH = '../src/generated/assets.js'
+    if not any([
+        not os.path.exists(path) or
+        file_changed(path) for path in SRC_PATHS
+    ]):
+        print("skipping rebuild of %s" % TARGET_PATH)
+
     tiles, asset_list = get_tile_assets('../build/assets.yaml')
     paths = {
         name: {
@@ -62,8 +77,8 @@ def generate_assets_js():
         ])
 
     lines = '\n'.join(generate())
-    print("rebuilt ../src/generated/assets.js")
-    save_file('../src/generated/assets.js', lines)
+    print("rebuilt %s" % TARGET_PATH)
+    save_file(TARGET_PATH, lines)
     # print(lines)
 
 

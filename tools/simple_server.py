@@ -7,6 +7,7 @@ from rebuild_phaser_renderer import \
     rebuild_phaser, generate_assets_js, generate_config_js, \
     generate_webpack_builds
 from utils import load_yaml, write_yaml
+import time
 
 PORT = 5000
 MAX_PORT_OPEN_ATTEMPTS = 20
@@ -141,10 +142,12 @@ def run_observers():
             }
             for path, actions in event_handlers.items():
                 if event.src_path.startswith(path):
+                    start = time.time()
                     print("triggered: %s, %s" % (path, event.src_path))
                     for action in actions:
                         action()
                     open_observed_file()
+                    print("updated in %0.2f second(s)" % (time.time() - start))
                     break
 
     observer = Observer()

@@ -4,7 +4,7 @@ import codecs
 import pickle
 import time
 
-MAX_GENERATIONS = 32
+MAX_GENERATIONS = 2 ** 31
 
 
 class FileScanner:
@@ -69,6 +69,7 @@ class FileScanner:
         if self.last_walk_time > time.time() + 0.1:
             self.last_walk_time = time.time()
             self.advance_generation()
+
         old_info = self.last_stat_info[path] if path in self.last_stat_info else '<none>'
         new_info = self.get_info(path)
         if new_info != old_info or path not in self.content_cache:
@@ -76,6 +77,13 @@ class FileScanner:
             with codecs.open(path, 'r', encoding='utf-8', errors='ignore') as f:
                 self.content_cache[path] = f.read()
         return self.content_cache[path]
+
+    def changed(self, path, use_cached=False):
+        if not use_cached:
+            self.advance_generation()
+        old_info = self.last_stat_info[path] if path in self.last_stat_info else '<none>'
+        new_info = self.get_info(path)
+        return new_info != old_info
 
     def get_hash_of(self, content):
         return hashlib.sha1(content.encode('utf-8')).hexdigest()
