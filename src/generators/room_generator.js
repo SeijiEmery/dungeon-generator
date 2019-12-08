@@ -55,11 +55,7 @@ export function graph_dungeon (params) {
                ){
                 rooms[i].edges.push(j);
                 rooms[j].edges.push(i);
-
-                //console.log("rooms[" + i + "] " + rooms[i].edges);
-                //console.log("rooms[" + j + "] " + rooms[j].edges);
             }
-            //console.log("[[[[[[[[[[[[[[[[[[[");
         }
     }
     // expand room alg here
@@ -90,7 +86,7 @@ export function graph_dungeon (params) {
         }
 
         let totalEdges = Math.max(1, tempArr.length - 1);
-        let numTunnels = randIntRange(1,totalEdges);
+        let numTunnels = randIntRange(0,totalEdges);
 
         console.log("semi temp = " + tempArr);
         console.log("semi tunnels = " + r.tunnels);
