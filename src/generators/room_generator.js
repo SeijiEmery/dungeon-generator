@@ -20,7 +20,7 @@ export function graph_dungeon (params) {
     // Multiply each coord by some multiplier
     // Populate partitions rooms
     let partitions = [];
-    partition_rooms(partitions,0,0,width,height,numRooms);
+    partition_rooms(partitions,0,0,width - 1,height - 1,numRooms);
     /*for(let i = 0; i < numPartX; ++i){
         for(let j = 0; j < numPartY; ++j){
             partitions[i + j * numPartX] = {
@@ -170,15 +170,24 @@ function partition_rooms(array, X0,Y0,X,Y,ROOMS){
     var part2 = ROOMS - part1;
 
     if(ROOMS % 2 == 0){
-        var split = Math.floor(X/2);
+        var split = divide_partition(X0,X,part1,part2)
         partition_rooms(array, X0,Y0,split,Y,part1);
         partition_rooms(array, split,Y0,X,Y,part2)
         return;
     }
     if(ROOMS % 2 == 1){
-        var split = Math.floor(Y/2);
+        var split = divide_partition(Y0,Y,part1,part2);
         partition_rooms(array, X0,Y0,X,split,part1);
-        partition_rooms(array, X,split,X,Y,part2);
+        partition_rooms(array, X0,split,X,Y,part2);
         return;
     }
+}
+
+function divide_partition (low,high,rooms1,rooms2){
+    var lower_bound = low + (5 * rooms1);
+    var upper_bound = high - (5 * rooms2);
+    if(lower_bound > upper_bound){
+        //throw an error
+    }
+    return randIntRange(lower_bound,upper_bound);
 }
