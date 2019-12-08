@@ -15,6 +15,7 @@ import os
 import subprocess
 from utils import save_jinja_template, get_tile_assets, save_file, load_yaml,\
     file_changed
+from scan_js_deps import scan_js_deps
 import json
 
 
@@ -23,14 +24,16 @@ INDENT_4 = ' ' * 4
 INDENT_8 = ' ' * 8
 
 
-def needs_update(path):
-    if type(path) == list:
-        paths = path
+def needs_update(src_path, target_path):
+    if not os.path.exists(target_path):
+        return True
+    if type(src_path) == list:
+        paths = src_path
         for path in paths:
-            if needs_update(path):
+            if needs_update(path, target_path):
                 return True
         return False
-    return not os.path.exists(path) or file_changed(path)
+    return not os.path.exists(src_path) or file_changed(src_path)
 
 
 def generate_assets_js():
@@ -42,7 +45,7 @@ def generate_assets_js():
         if file.endswith('.zip')
     ]
     TARGET_PATH = '../src/generated/assets.js'
-    if needs_update(SRC_PATHS):
+    if needs_update(SRC_PATHS, TARGET_PATH):
         print("skipping rebuild of %s" % TARGET_PATH)
 
     tiles, asset_list = get_tile_assets('../build/assets.yaml')
@@ -92,14 +95,38 @@ def generate_assets_js():
 def generate_config_js():
     SRC_FILE = '../config/config.yaml'
     TARGET_FILE = '../src/generated/config.json'
-    if needs_update(SRC_FILE):
+    if needs_update(SRC_FILE, TARGET_FILE):
         config = load_yaml(SRC_FILE)
         save_file(TARGET_FILE, json.dumps(config))
     else:
         print("skipping generation of %s" % TARGET_FILE)
 
 
-def generate_webpack_builds(entry_dir='../src/tests'):
+def generate_webpack_builds(changed_files=None, entry_dir='../src/tests', force_rebuild=False):
+    if not needs_update('../src/', '../build/'):
+        print("no js files changed; skipping rebuild")
+        return
+
+    entrypoints = [
+        os.path.join(entry_dir, file)
+        for file in os.listdir(entry_dir)
+        if file.endswith('.js')
+    ]
+    if changed_files and not force_rebuild:
+        all_js_deps = scan_js_deps()
+        def get_entrypoints_to_rebuild(entrypoints):
+            for entrypoint in entrypoints:
+                for dep in all_js_deps[entrypoint]:
+                    if dep in changed_files:
+                        yield entrypoint
+                        break
+
+        entrypoints = list(get_entrypoints_to_rebuild(entrypoints))
+        if len(entrypoints) == 0:
+            print("no files to rebuild!")
+            return
+        print("rebuilding '%s'" % ', '.join(entrypoints))
+
     for file in os.listdir(entry_dir):
         if not file.endswith('.js'):
             continue
@@ -108,7 +135,8 @@ def generate_webpack_builds(entry_dir='../src/tests'):
         config_path = os.path.join(
             '../build/webpack_configs/', filename + '.config.js')
         output_path = os.path.join('../build', filename + '.html')
-        save_file(config_path, '''module.exports = {{
+
+        webpack_build_config = '''module.exports = {{
             entry: '{entry_path}',
             mode: 'development',
             output: {{ filename: '{filename}.js', path: '{builddir}' }}
@@ -116,13 +144,15 @@ def generate_webpack_builds(entry_dir='../src/tests'):
                                        .replace('\\', '\\\\'),
                      filename=filename,
                      builddir=os.path.abspath('../build')
-                                     .replace('\\', '\\\\')))
+                                     .replace('\\', '\\\\'))
 
-        print("webpack-cli --config {} --display=minimal".format(config_path))
+        save_file(config_path, webpack_build_config)
+
+        # print("webpack-cli --config {} --display=minimal".format(config_path))
         res = subprocess.run(
             "webpack-cli --config {} --display=minimal".format(config_path),
             shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        print(res)
+        # print(res)
         if res.returncode == 0:
             save_jinja_template('../templates/phaser_template.html',
                                 output_path,
@@ -141,7 +171,7 @@ def generate_webpack_builds(entry_dir='../src/tests'):
 def rebuild_phaser():
     generate_assets_js()
     generate_config_js()
-    generate_webpack_builds()
+    generate_webpack_builds([ '../src/tests/barrel.js' ], force_rebuild=True)
 
 
 if __name__ == '__main__':

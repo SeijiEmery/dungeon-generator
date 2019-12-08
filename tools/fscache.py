@@ -106,10 +106,11 @@ class FileScanner:
             self.advance_generation()
         if os.path.exists(path) and self.get_hash(path) == self.get_hash_of(content):
             print('skipping write to %s (nothing changed)' % path)
-            return
+            return False
         with open(path, 'w') as f:
             f.write(content)
             self.content_cache[path] = content
+        return True
 
 
 if __name__ == '__main__':

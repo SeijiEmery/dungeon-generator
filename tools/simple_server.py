@@ -140,15 +140,30 @@ def run_observers():
                 '../tools': (relaunch_self,),
                 '../src': (maybe_rebuild_phaser,),
             }
+            detected_rebuild = False
             for path, actions in event_handlers.items():
                 if event.src_path.startswith(path):
                     start = time.time()
                     print("triggered: %s, %s" % (path, event.src_path))
                     for action in actions:
                         action()
-                    open_observed_file()
+                    # open_observed_file()
                     print("updated in %0.2f second(s)" % (time.time() - start))
                     break
+
+                if OBSERVED_PATH.endswith('.html'):
+                    if event.src_path == OBSERVED_PATH or event.src_path.replace('.js', '.html') == OBSERVED_PATH:
+                        detected_rebuild = True
+                        print("rebuild detected on '%s'" % event.src_path)
+                    else:
+                        print("skipping event '%s'" % event.src_path)
+                # elif event.src_path.startswith('../build'):
+                #     path = event.src_path.strip('../build')
+                #     base, file = os.path.split(path)
+                #     if base == '' and file.endswith('.js'):
+                #         detected_rebuild = True
+            if detected_rebuild:
+                open_observed_file()
 
     observer = Observer()
     observer.schedule(Handler(), '..', recursive=True)

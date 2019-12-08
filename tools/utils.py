@@ -73,7 +73,8 @@ def write_yaml(file, obj):
         file (str): path to a .yaml file
         obj: any python type (dict, list, str, int, float preferred)
     """
-    save_file(file, yaml.dump(obj))
+    if save_file(file, yaml.dump(obj)):
+        print("saved '%s'" % file)
 
 
 def load_yaml(path):
@@ -83,8 +84,6 @@ def load_yaml(path):
 
 def load_file(path):
     """ Convenience function to load a text file + call <file>.read() """
-    # with open(path, 'r') as f:
-    #     return f.read()
     return fscache.load_file(path)
 
 
@@ -96,10 +95,8 @@ def save_file(path, data):
         print("generating missing directories: '%s'" % basedir)
         os.makedirs(basedir)
 
-    print("saving '%s'" % path)
-    fscache.save_file(path, data)
-    # with open(path, 'w') as f:
-    #     f.write(data)
+    # print("saving '%s'" % path)
+    return fscache.save_file(path, data)
 
 
 def file_changed(path):
@@ -108,8 +105,8 @@ def file_changed(path):
 
 def save_jinja_template(template_html, output_html, *args, **kwargs):
     template = Template(load_file(template_html))
-    save_file(output_html, template.render(*args, **kwargs))
-    print("generated %s:" % output_html)
+    if save_file(output_html, template.render(*args, **kwargs)):
+        print("generated %s:" % output_html)
     # print(template.render(*args, **kwargs))
 
 
