@@ -54,16 +54,12 @@ function getNeighbors(grid, node) {
 
 export function search(grid, start, end) {
 	var searchGrid = init(grid);
-	console.log(searchGrid, "searchGrid");
 	var goodList = [];
 	var closedList = [];
 	var fail = [];
 	var xPos = start.x;
 	var yPos = start.y;
 	fail.push(searchGrid[xPos][yPos]);
-	console.log(searchGrid[xPos][yPos]);
-	console.log(fail, 22222222);
-	console.log(fail[0], "Start");
 	var nice = 1;
 	while(nice > 0) {
 		nice--;
@@ -72,10 +68,7 @@ export function search(grid, start, end) {
 	  for(var i= 0; i<fail.length; i++) {
 	    if(fail[i].f < fail[lowInd].f) { lowInd = i; }
 	  }
-	  console.log(fail, "Line 75");
 	  var currentNode = fail[lowInd];
-	  console.log(fail, "Line 77")
-	  console.log(currentNode);
 	  // End case -- result has been found, return the traced path
 	  if(currentNode.x == end.x && currentNode.y == end.y) {
 	    var curr = currentNode;
@@ -86,24 +79,21 @@ export function search(grid, start, end) {
 	    }
 	    return ret.reverse();
 	  }
-	  console.log(fail, "Line 89");
+
 	  // Normal case -- move currentNode from open to closed, process each of its neighbors
-	  console.log(goodList[0]);
+
 	  var m = 0;
 	  for( m; m < fail.length; m++){
 	  	if(fail[m]==currentNode){
-	  		console.log(fail[m], currentNode);
 	  		fail.splice(m,1);
 	  		break;
 	  	}
 	  }
-	  //console.log(ind, "indexOf")
-	  console.log(fail, "Line 93");
+
 	  
-	  //console.log(goodList[0]);
+
 	  closedList.push(currentNode);
-	  console.log(closedList, "closedList");
-	  console.log(closedList[0], "closedList[0]");
+
 	  var neighbors = getNeighbors(searchGrid, currentNode);
 	  
 	  for(var i= 0; i<neighbors.length;i++) {
@@ -136,7 +126,6 @@ export function search(grid, start, end) {
 	        if(firstVisted){
 				gScoreIsBest = true;
 	         	neighbor.h = heuristic(neighbor, end);
-	         	console.log(neighbor, "neighbor");
 	         	fail.push(neighbor);
 	        }
 	           	
