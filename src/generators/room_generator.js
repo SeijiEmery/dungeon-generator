@@ -38,16 +38,28 @@ export function graph_dungeon (params) {
 
         let r = rooms[i];
         let p = partitions[i];
-        r.width = randIntRange(1,Math.abs(p.x1-p.x2)-1);
-        r.height = randIntRange(1,Math.abs(p.y1-p.y2)-1);
-        r.x = randIntRange(p.x1 + 1,p.x2 - r.width - 1);
-        r.y = randIntRange(p.y1 + 1,p.y2 - r.height - 1);
+        // temp solution to control whether we want max size or not
+        if(false){
+            r.width = Math.abs(p.x1-p.x2)-1;
+            r.height = Math.abs(p.y1-p.y2)-1;
+            r.x = p.x1 + 1;
+            r.y = p.y1 + 1;
+        }
+        else{
+            r.width = randIntRange(1,Math.abs(p.x1-p.x2)-1);
+            r.height = randIntRange(1,Math.abs(p.y1-p.y2)-1);
+            r.x = randIntRange(p.x1 + 1,p.x2 - r.width - 1);
+            r.y = randIntRange(p.y1 + 1,p.y2 - r.height - 1);
+        }
+        
+        //console.log("room " + i + ": " + r.width + " " + r.height + ", " + r.x + " " + r.y);
+        console.log("room " + i);
+        console.log(r);
     }
 
     // Create graph alg here
     for(let i = 0; i < numRooms; ++i){
         for(let j = i + 1; j < numRooms; ++j){
-            //console.log("now checking " + i + " and " + j);
             if(partitions[i].x1 === partitions[j].x2 ||
                partitions[i].y1 === partitions[j].y2 ||
                partitions[i].x2 === partitions[j].x1 ||
@@ -70,11 +82,6 @@ export function graph_dungeon (params) {
 
         let tempArr = r.edges.slice(0);
 
-        console.log("//////////////////");
-        console.log("checking " + i);
-        //console.log("old temp = " + tempArr);
-        //console.log("old tunnels = " + r.tunnels);
-
         // Only consider new tunnels
         // Trim current tunnels out of possible candidates
         for(let i = 0; i < r.tunnels.length; ++i){
@@ -88,50 +95,29 @@ export function graph_dungeon (params) {
         let totalEdges = Math.max(1, tempArr.length - 1);
         let numTunnels = randIntRange(0,totalEdges);
 
-        //console.log("semi temp = " + tempArr);
-        //console.log("semi tunnels = " + r.tunnels);
-
         // Pick new tunnels
         for(let j = 0; j < numTunnels; ++j){
-            //console.log("   in progress temp = " + tempArr);
-
             let chosenIndex = randInt(tempArr.length-1);
             let chosenValue = tempArr[chosenIndex];
-
-            //console.log("   chosenIndex = " + chosenIndex);
-            //console.log("   chosenValue = " + chosenValue);
 
             r.tunnels.push(chosenValue);
             rooms[chosenValue].tunnels.push(i);
 
-            //console.log("   1in progress temp = " + tempArr);
             delete_arr_elem(tempArr,chosenIndex);
-            //console.log("   3in progress temp = " + tempArr);
         }
-
-        //console.log("old edges = " + r.edges);
-        //console.log("new temp = " + tempArr);
-        console.log("new tunnels = " + r.tunnels);
-    }
-
-    console.log("Before DFS");
-    for(let i = 0; i < numRooms; ++i){
-        console.log(i + " edges: " + rooms[i].edges);
-        console.log(i + " tunnels: " + rooms[i].tunnels);
     }
 
     // Check for completion
     while(true){
         // Run dfs
-        let dfs_result = dfs(rooms, numRooms);
-        console.log(dfs_result);
+        // each index of dfs_result corresponds to rooms
+        let dfs_result = dfs(rooms);
 
         // Log which rooms were unvisited in dfs
         let incomplete = [];
         for(let i = 0; i < numRooms; ++i){
             if(dfs_result[i] === false){
                 incomplete.push(i);
-                break;
             }
         }
 
@@ -141,12 +127,6 @@ export function graph_dungeon (params) {
         }
         // else, carve a new tunnel and try again
         carve_new_tunnel(incomplete, rooms, dfs_result);
-    }
-
-    console.log("After DFS");
-    for(let i = 0; i < numRooms; ++i){
-        console.log(i + " edges: " + rooms[i].edges);
-        console.log(i + " tunnels: " + rooms[i].tunnels);
     }
 
     // Dig tunnels
@@ -170,8 +150,25 @@ export function graph_dungeon (params) {
 }
 
 function carve_new_tunnel(incomplete, rooms, dfs_result) {
+    let chosenIndex = randInt(incomplete.length - 1); // index of incomplete
+    let chosenRoom = incomplete[chosenIndex]; // index of rooms
+
+    let r = rooms[chosenRoom];
+    let e = r.edges;
+    // We iterate through the edges of an unvisited room
+    for(let i = 0; i < e.length; ++i){
+        // to find another room that has been visited
+        let otherRoom = e[i];
+        if(dfs_result[otherRoom] === true){
+            // if it has, then we push in our tunnels that connection
+            r.tunnels.push(e[i]);
+            rooms[otherRoom].tunnels.push(chosenRoom);
+            return;
+        }
+    }
+
     // Iterate through all rooms that are disconnected
-    for(let i = 0; i < incomplete.length; ++i){
+    /*for(let i = 0; i < incomplete.length; ++i){
         // Iterate through a room's edges
         // incomplete[i] returns a rooms index
         let r = rooms[incomplete[i]];
@@ -185,7 +182,7 @@ function carve_new_tunnel(incomplete, rooms, dfs_result) {
                 return;
             }
         }
-    }
+    }*/
 }
 
 function create_bend (array, xroom1, yroom1, xroom2, yroom2){
@@ -223,7 +220,7 @@ function create_tunnel (array, xOrigin, yOrigin, xroom, yroom){
     let xwidth;
     let yheight;
     if(xOrigin != xroom){
-        xwidth = Math.abs(xOrigin - xroom + 1);
+        xwidth = Math.abs(xOrigin - xroom);
         yheight = 1;
     }
     else{
@@ -239,9 +236,9 @@ function delete_arr_elem(array,position){
     array.pop();
 }
 
-function dfs(rooms, numRooms){
+function dfs(rooms){
     let visited = [];
-    for(let i = 0; i < numRooms; ++i)
+    for(let i = 0; i < rooms.length; ++i)
         visited[i] = false;
     dfs_recursive(rooms, visited, 0);
 
