@@ -53,9 +53,9 @@ export function search(grid, start, end) {
 		var closedList = [];
 		openList.push(grid.get(start.x,start.y));
 		console.log(openList,openList.length, "Start Push");
-		var test_length = 12;
+		var test_length = 20;
 		var pushCount = 0;
-		while(test_length > 0){ //change with openList.length > 0
+		while(openList.length > 0){ //change with openList.length > 0
 			test_length--;
 
 			// Grab the lowest f(x) to process next
@@ -96,10 +96,14 @@ export function search(grid, start, end) {
 			
 			for (var i = 0; i < neighbors.length; i++) {
 				var neighbor = neighbors[i];
+				var found = false;
 				for (var j = 0; j < closedList.length; j++) {					
-					if(closedList[j] == neighbor || neighbor.wall ==1){
-						continue;
+					if(closedList[j] == neighbor){
+						found = true; 
 					}
+				}
+				if (found || neighbor.wall ==1){
+						continue;
 				}
 
 				// g score is the shortest distance from start to current node, we need to check if
