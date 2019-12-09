@@ -9,7 +9,7 @@ export function graph_dungeon (params) {
     // TODO: implement this
 
     let rooms = [];
-    let numRooms = 5;
+    let numRooms = 15;
 
     let dungeon = new Array2d(width,height);
 
@@ -60,10 +60,12 @@ export function graph_dungeon (params) {
     // Create graph alg here
     for(let i = 0; i < numRooms; ++i){
         for(let j = i + 1; j < numRooms; ++j){
-            if(partitions[i].x1 === partitions[j].x2 ||
-               partitions[i].y1 === partitions[j].y2 ||
-               partitions[i].x2 === partitions[j].x1 ||
-               partitions[i].y2 === partitions[j].y1
+            let thisP = partitions[i];
+            let thatP = partitions[j];
+            if(partition_adj_check(thisP.x1,thatP.x2,thisP.y1,thisP.y2,thatP.y1,thatP.y2) ||
+               partition_adj_check(thisP.y1,thatP.y2,thisP.x1,thisP.x2,thatP.x1,thatP.x2) ||
+               partition_adj_check(thisP.x2,thatP.x1,thisP.y1,thisP.y2,thatP.y1,thatP.y2) ||
+               partition_adj_check(thisP.y2,thatP.y1,thisP.x1,thisP.x2,thatP.x1,thatP.x2)
                ){
                 rooms[i].edges.push(j);
                 rooms[j].edges.push(i);
@@ -145,6 +147,11 @@ export function graph_dungeon (params) {
     }
 
     // Pick end and start rooms
+
+    for(let i = 0; i < numRooms; ++i){
+        console.log("end room " + i);
+        console.log(rooms[i]);
+    }
 
     return dungeon;
 }
@@ -253,6 +260,13 @@ function dfs_recursive(rooms, visited, position){
             dfs_recursive(rooms, visited, t[i]);
         }
     }
+}
+
+function partition_adj_check(thisx1,thatx2,thisy1,thisy2,thaty1,thaty2){
+    if(thisx1 === thatx2){
+        return (thisy1 <= thaty2 && thisy2 >= thaty1);
+    }
+    return false;
 }
 
 function partition_rooms(array, X0,Y0,X,Y,ROOMS){
