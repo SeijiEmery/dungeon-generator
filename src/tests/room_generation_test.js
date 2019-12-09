@@ -14,6 +14,7 @@ start(() => {
             dungeon.width = 25;
             dungeon.height = 25;
             let tiles = graph_dungeon(dungeon);
+            console.log(tiles);
             drawBasicGrid(this, {
                 grid: tiles,
                 spacing: 60,

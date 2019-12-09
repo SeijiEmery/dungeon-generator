@@ -3,9 +3,10 @@ import { drawBasicGrid } from '../core/basic_renderer'
 import { basic_dungeon } from '../generators/basic_generator'
 import { ASSETS_BY_CATEGORY } from '../generated/assets'
 import { dungeon } from '../generated/config'
-
+import { search } from '../astar/basic_astar'
 // const TILESET = ASSETS_BY_CATEGORY['objects'];
 const TILESET = [ "barrel_E" ];
+const PATHTILE = [ "chair_E" ];
 start(() => {
     const game = runPhaser({
         create: function() {
@@ -14,11 +15,15 @@ start(() => {
             dungeon.width = 20;
             dungeon.height = 20;
             let tiles = basic_dungeon(dungeon);
+            console.log(tiles);
             drawBasicGrid(this, {
-                grid: tiles,
+                grid: tiles.dungeon,
                 spacing: 60,
                 tileset: TILESET
             });
+            
+            let pathfinder = search(tiles.dungeon, tiles.start, tiles.end);
+            //console.log(pathfinder);
         }
     })
 })

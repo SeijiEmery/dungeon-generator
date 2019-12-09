@@ -60,12 +60,12 @@ export function basic_dungeon (params) {
     end.x = rooms[numRooms-1].x + randInt(rooms[numRooms-1].width);
     end.y = rooms[numRooms-1].y + randInt(rooms[numRooms-1].height);
 
-    /*return {
+    return {
         dungeon: dungeon,
         start: start,
         end: end,
-    };*/
-    return dungeon;
+    };
+   // return dungeon;
 }
 
 function create_bend (array, xroom1, yroom1, xroom2, yroom2){
