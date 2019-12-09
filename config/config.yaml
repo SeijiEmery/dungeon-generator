@@ -12,3 +12,6 @@ random:
 
 camera:
   zoom: 0.4
+  origin: -2000
+  width: 4000
+  speed: 2.0
