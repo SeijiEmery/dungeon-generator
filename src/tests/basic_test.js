@@ -3,12 +3,12 @@ import { drawBasicGrid } from '../core/basic_renderer'
 import { basic_dungeon } from '../generators/basic_generator'
 import { ASSETS_BY_CATEGORY } from '../generated/assets'
 import { dungeon } from '../generated/config'
-import { search } from '../astar/astar_rewrite'
 import { convert_path } from '../astar/astar_rewrite'
 import { Array2d } from '../core/array2d'
 // const TILESET = ASSETS_BY_CATEGORY['objects'];
 const TILESET = [ "barrel_E" ];
 const PATHTILE = [ "chair_E" ];
+const PATHKEY = [ "chair_N" ];
 start(() => {
     const game = runPhaser({
         create: function() {
@@ -23,13 +23,21 @@ start(() => {
                 spacing: 60,
                 tileset: TILESET
             });
-            
-            let pathfinder = search(tiles.dungeon, tiles.start, tiles.end);
-            //console.log(pathfinder,pathfinder.length, "pathfinder");
 
-            let path = convert_path(pathfinder,dungeon.width,dungeon.height);
+            ///////////////////////to key
+                            //grid, start, end,  dungeonGridWidth, dungeonGrid Height
+            let keyPath = convert_path(tiles.dungeon, tiles.start, tiles.key,dungeon.width,dungeon.height);
 
-            //console.log(path);
+            drawBasicGrid(this, {
+                grid: keyPath,
+                spacing: 60,
+                tileset: PATHKEY
+            });
+
+            ///////////////////////to end
+
+            let path = convert_path(tiles.dungeon, tiles.key, tiles.end,dungeon.width,dungeon.height);
+
             drawBasicGrid(this, {
                 grid: path,
                 spacing: 60,
