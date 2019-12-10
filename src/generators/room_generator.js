@@ -1,4 +1,6 @@
 import { Array2d } from '../core/array2d'
+import { get } from '../core/array2d'
+import { set } from '../core/array2d'
 import { randInt } from '../core/random'
 import { randIntRange } from '../core/random'
 
@@ -186,6 +188,7 @@ export function graph_dungeon (params) {
     };
 }
 
+// Adds a new tunnel to a room's tunnels array
 function carve_new_tunnel(incomplete, rooms, dfs_result) {
     let chosenIndex = randInt(incomplete.length - 1); // index of incomplete
     let chosenRoom = incomplete[chosenIndex]; // index of rooms
@@ -205,6 +208,106 @@ function carve_new_tunnel(incomplete, rooms, dfs_result) {
     }
 }
 
+function create_gradual_tunnel_base(array, direction,
+                                    room1X, room1Y,
+                                    firstCoordX, firstCoordY,
+                                    secondCoordX, secondCoordY,
+                                    room2X, room2Y){
+    let seenWalls = {status: false,};
+    let wallStatus;
+
+    // So I can make use of break
+    for(let i = 0; i < 1; ++i){
+        if(direction === "x"){
+            wallStatus = create_gradual_tunnel(array, secondCoordX,room2Y,secondCoordX,secondCoordY, seenWalls);
+            //wallStatus = create_tunnel(array, firstCoordX,room1Y,firstCoordX,firstCoordY, seenWalls);
+            if(wallStatus === 1){
+                break;
+            }
+            wallStatus = create_gradual_tunnel(array, secondCoordX,secondCoordY,firstCoordX,firstCoordY, seenWalls);
+            //wallStatus = create_tunnel(array, firstCoordX,firstCoordY,secondCoordX,secondCoordY, seenWalls);
+            if(wallStatus === 1){
+                break;
+            }
+            wallStatus = create_gradual_tunnel(array, firstCoordX,firstCoordY,firstCoordX,room1Y, seenWalls);
+            //wallStatus = create_tunnel(array, secondCoordX,secondCoordY,secondCoordX,room2Y, seenWalls);
+        }
+        else{
+            wallStatus = create_gradual_tunnel(array, room2X,secondCoordY,secondCoordX,secondCoordY, seenWalls);
+            //wallStatus = create_tunnel(array, room1X,firstCoordY,firstCoordX,firstCoordY, seenWalls);
+            if(wallStatus === 1){
+                break;
+            }
+            wallStatus = create_gradual_tunnel(array, secondCoordX,secondCoordY,firstCoordX,firstCoordY, seenWalls);
+            //wallStatus = create_tunnel(array, firstCoordX,firstCoordY,secondCoordX,secondCoordY, seenWalls);
+            if(wallStatus === 1){
+                break;
+            }
+            wallStatus = create_gradual_tunnel(array, room2X,secondCoordY,secondCoordX,secondCoordY, seenWalls);
+            //wallStatus = create_tunnel(array, secondCoordX,secondCoordY,room2X,secondCoordY, seenWalls);
+        }
+    }
+    
+}
+
+// Digs a new tunnel that stops if encountered a tunnel
+function create_gradual_tunnel (array, xOrigin, yOrigin, xEnd, yEnd, seenWalls){
+    //console.log("tunnel: (" + xOrigin + ", " + yOrigin + ") , (" + xroom + ", " + yroom + ")");
+
+    let xtunnel = Math.min(xOrigin,xEnd);
+    let ytunnel = Math.min(yOrigin,yEnd);
+
+    let tunnelLength;
+    let tunnelDir;
+    // Dig in the X direction
+    if(xOrigin != xEnd){
+        tunnelLength = Math.abs(xOrigin - xEnd) + 1;
+        tunnelDir = Math.sign(xEnd - xOrigin);
+        for(let i = 1; i < tunnelLength; ++i){
+            if(array.get(xOrigin + tunnelDir*i, yOrigin) === 0){
+                // Check to see if it's in a room or in a tunnel
+                if(seenWalls.status === true){
+                    // encountered a tunnel while digging
+                    return 1;
+                }
+                // else, I haven't started digging yet
+            }
+            else{
+                // I have started digging!
+                seenWalls.status = true;
+                array.set(xOrigin + tunnelDir*i, yOrigin, 0);
+            }
+        }
+    }
+    // Dig in the Y direction
+    else if(yOrigin != yEnd){
+        tunnelLength = Math.abs(yOrigin - yEnd) + 1;
+        tunnelDir = Math.sign(yEnd - yOrigin);
+        for(let i = 1; i < tunnelLength; ++i){
+            if(array.get(xOrigin, yOrigin + tunnelDir*i) === 0){
+                // Check to see if it's in a room or in a tunnel
+                if(seenWalls.status === true){
+                    // encountered a tunnel while digging
+                    return 1;
+                }
+                // else, I haven't started digging yet
+            }
+            else{
+                // I have started digging!
+                seenWalls.status = true;
+                array.set(xOrigin, yOrigin + tunnelDir*i, 0);
+            }
+        }
+    }
+    else{
+        console.log("error: some coords enterred wrong in create_gradual_tunnel()");
+    }
+
+    // Encountered no tunnels
+    return 0;
+}
+
+// Creates tunnels that do not intersect with rooms
 function create_smart_tunnel(array, partitions, rooms, firstRoom, secondRoom){
     let thisP = partitions[firstRoom];
     let thatP = partitions[secondRoom];
@@ -247,7 +350,12 @@ function create_smart_tunnel(array, partitions, rooms, firstRoom, secondRoom){
     firstCoord[axisAdj] = rooms[firstRoom][axisAdj] + randInt(firstRoomLength);
     secondCoord[axisAdj] = rooms[secondRoom][axisAdj] + randInt(secondRoomLength);
 
-    if(axisAdj === "x"){
+    create_gradual_tunnel_base(array, axisAdj,
+                                    rooms[firstRoom].x, rooms[firstRoom].y,
+                                    firstCoord.x, firstCoord.y,
+                                    secondCoord.x, secondCoord.y,
+                                    rooms[secondRoom].x, rooms[secondRoom].y);
+    /*if(axisAdj === "x"){
         create_tunnel(array, firstCoord.x,rooms[firstRoom].y,firstCoord.x,firstCoord.y);
         create_tunnel(array, firstCoord.x,firstCoord.y,secondCoord.x,secondCoord.y);
         create_tunnel(array, secondCoord.x,secondCoord.y,secondCoord.x,rooms[secondRoom].y);
@@ -256,7 +364,7 @@ function create_smart_tunnel(array, partitions, rooms, firstRoom, secondRoom){
         create_tunnel(array, rooms[firstRoom].x,firstCoord.y,firstCoord.x,firstCoord.y);
         create_tunnel(array, firstCoord.x,firstCoord.y,secondCoord.x,secondCoord.y);
         create_tunnel(array, secondCoord.x,secondCoord.y,rooms[secondRoom].x,secondCoord.y);
-    }
+    }*/
 }
 
 function create_bend (array, xroom1, yroom1, xroom2, yroom2){
