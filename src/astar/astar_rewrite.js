@@ -1,4 +1,5 @@
 import { Array2d } from '../core/array2d'
+
 function init(grid) {
 	for(var i = 0; i < grid.width; i++){
 		for(var j = 0; j < grid.height; j++){
@@ -92,7 +93,7 @@ export function search(grid, start, end) {
 			//console.log(closedList,closedList.length, "Add to closedList");
 
 			var neighbors = getNeighbors(grid, currentNode);
-			//console.log(neighbors);
+			//console.log(neighbors,"All neighbor");
 			
 			for (var i = 0; i < neighbors.length; i++) {
 				var neighbor = neighbors[i];
@@ -124,7 +125,6 @@ export function search(grid, start, end) {
 		        if(firstVisted){
 					gScoreIsBest = true;
 		         	neighbor.h = heuristic(neighbor, end);
-		         	//WE SOMEHOW PUSH NEIGHBORS THAT ARE WALLS//
 		         	//console.log(neighbor, "heuristic");
 		         	openList.push(neighbor);
 		         	pushCount++;
@@ -145,6 +145,18 @@ export function search(grid, start, end) {
 		        }
 			}
 		}
-		//console.log(pushCount);
 		return [];
+}
+
+export function convert_path(path, width, height){
+	
+    let newPath = new Array2d(width,height);
+        newPath.fill((x,y) => {
+            return 0;
+        });
+    for(var i = 0; i < path.length; i++){
+        newPath.set(path[i].x,path[i].y,1);
+        //console.log(newPath.get(path[i].x,path[i].y), "path.get");
+	}
+	return newPath;
 }
