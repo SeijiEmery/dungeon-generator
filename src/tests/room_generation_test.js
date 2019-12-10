@@ -11,9 +11,9 @@ start(() => {
         create: function() {
             // manually set dungeon size + camera zoom (override config...?)
             this.camera.zoom = 0.4;
-            dungeon.width = 50;
-            dungeon.height = 50;
-            dungeon.numberOfRooms = 20;
+            dungeon.width = 100;
+            dungeon.height = 100;
+            dungeon.numberOfRooms = 50;
             let output = graph_dungeon(dungeon);
             let tiles = output.dungeon;
             drawBasicGrid(this, {

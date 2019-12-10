@@ -243,7 +243,7 @@ function create_gradual_tunnel_base(array, direction,
             if(wallStatus === 1){
                 break;
             }
-            wallStatus = create_gradual_tunnel(array, room2X,secondCoordY,secondCoordX,secondCoordY, seenWalls);
+            wallStatus = create_gradual_tunnel(array, firstCoordX,firstCoordY,room1X,firstCoordY, seenWalls);
             //wallStatus = create_tunnel(array, secondCoordX,secondCoordY,room2X,secondCoordY, seenWalls);
         }
     }
@@ -253,6 +253,8 @@ function create_gradual_tunnel_base(array, direction,
 // Digs a new tunnel that stops if encountered a tunnel
 function create_gradual_tunnel (array, xOrigin, yOrigin, xEnd, yEnd, seenWalls){
     //console.log("tunnel: (" + xOrigin + ", " + yOrigin + ") , (" + xroom + ", " + yroom + ")");
+
+    if(xOrigin === xEnd && yOrigin === yEnd) return 0;
 
     let xtunnel = Math.min(xOrigin,xEnd);
     let ytunnel = Math.min(yOrigin,yEnd);
