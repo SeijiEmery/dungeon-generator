@@ -4,12 +4,9 @@ import { randIntRange } from '../core/random'
 
 
 export function graph_dungeon (params) {
-    const { width, height } = params;
-
-    // TODO: implement this
+    const { width, height, numberOfRooms } = params;
 
     let rooms = [];
-    let numRooms = 50;
 
     let dungeon = new Array2d(width,height);
 
@@ -20,9 +17,12 @@ export function graph_dungeon (params) {
     // Multiply each coord by some multiplier
     // Populate partitions rooms
     let partitions = [];
-    partition_rooms(partitions,0,0,width - 1,height - 1,numRooms);
+    partition_rooms(partitions,0,0,width - 1,height - 1,numberOfRooms);
 
     console.log(partitions);
+
+    // If the partitions comes out to less than the desired number
+    let numRooms = partitions.length;
 
     // Pick random locations for room
     for(let i = 0; i < numRooms; ++i){
@@ -46,8 +46,10 @@ export function graph_dungeon (params) {
             r.y = p.y1 + 1;
         }
         else{
-            r.width = randIntRange(1,Math.abs(p.x1-p.x2)-1);
-            r.height = randIntRange(1,Math.abs(p.y1-p.y2)-1);
+            let minXSize = Math.min(3,Math.abs(p.x1-p.x2)-1);
+            let minYSize = Math.min(3,Math.abs(p.y1-p.y2)-1);
+            r.width = randIntRange(minXSize,Math.abs(p.x1-p.x2)-1);
+            r.height = randIntRange(minYSize,Math.abs(p.y1-p.y2)-1);
             r.x = randIntRange(p.x1 + 1,p.x2 - r.width - 1);
             r.y = randIntRange(p.y1 + 1,p.y2 - r.height - 1);
         }
@@ -134,6 +136,7 @@ export function graph_dungeon (params) {
     // Dig tunnels
     for(let i = 0; i < numRooms; ++i){
         let t = rooms[i].tunnels;
+        //if(i < 25 || i > 25) continue;
         for(let j = 0; j < t.length; ++j){
             // any index t[j] is less than i has already been dug
             if(i < t[j]){
@@ -302,7 +305,7 @@ function dfs_recursive(rooms, visited, position){
 
 function partition_adj_check(thisx1,thatx2,thisy1,thisy2,thaty1,thaty2){
     if(thisx1 === thatx2){
-        return (thisy1 <= thaty2 && thisy2 >= thaty1);
+        return (thisy1 < thaty2 && thisy2 > thaty1);
     }
     return false;
 }
@@ -339,6 +342,16 @@ function partition_rooms(array, X0,Y0,X,Y,ROOMS){
     // Splits into left/right rooms
     if(pWidth > pLength){
         var split = divide_partition(X0,X,part1,part2)
+        if(split === -1){
+            let cell = {
+                x1: X0,
+                y1: Y0,
+                x2: X,
+                y2: Y,
+            }
+            array.push(cell);
+            return;
+        }
         partition_rooms(array, X0,Y0,split,Y,part1);
         partition_rooms(array, split,Y0,X,Y,part2)
         return;
@@ -346,6 +359,16 @@ function partition_rooms(array, X0,Y0,X,Y,ROOMS){
     // Splits into up/down rooms
     else{
         var split = divide_partition(Y0,Y,part1,part2);
+        if(split === -1){
+            let cell = {
+                x1: X0,
+                y1: Y0,
+                x2: X,
+                y2: Y,
+            }
+            array.push(cell);
+            return;
+        }
         partition_rooms(array, X0,Y0,X,split,part1);
         partition_rooms(array, X0,split,X,Y,part2);
         return;
@@ -355,11 +378,12 @@ function partition_rooms(array, X0,Y0,X,Y,ROOMS){
 function divide_partition (low,high,rooms1,rooms2){
     var lower_bound = low;
     var upper_bound = high;
-    if(Math.abs(high-low) > 5 * (rooms1 + rooms2)){
-        lower_bound += (5 * rooms1);
-        upper_bound -= (5 * rooms2);
+    var diff = Math.abs(high-low);
+    if(diff > 4){
+        lower_bound += Math.floor(diff*.25);
+        upper_bound -= Math.floor(diff*.25);
+        //console.log(lower_bound + " " + upper_bound);
         return randIntRange(lower_bound,upper_bound);
     }
-    
-    return Math.floor((lower_bound + upper_bound) / 2);
+    return -1;
 }

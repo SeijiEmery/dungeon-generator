@@ -13,6 +13,7 @@ start(() => {
             this.camera.zoom = 0.4;
             dungeon.width = 100;
             dungeon.height = 100;
+            dungeon.numberOfRooms = 50;
             let tiles = graph_dungeon(dungeon);
             drawBasicGrid(this, {
                 grid: tiles,
