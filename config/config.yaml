@@ -13,5 +13,5 @@ random:
 camera:
   zoom: 0.4
   origin: -3000
-  width: 5000
+  width: 7000
   speed: 2.0

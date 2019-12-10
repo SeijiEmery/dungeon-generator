@@ -141,7 +141,8 @@ export function graph_dungeon (params) {
                 let ymidRoom1 = Math.floor(rooms[i].y + rooms[i].height/2);
                 let xmidRoom2 = Math.floor(rooms[t[j]].x + rooms[t[j]].width/2);
                 let ymidRoom2 = Math.floor(rooms[t[j]].y + rooms[t[j]].height/2);
-                create_bend(dungeon, xmidRoom1, ymidRoom1, xmidRoom2, ymidRoom2);
+                //create_bend(dungeon, xmidRoom1, ymidRoom1, xmidRoom2, ymidRoom2);
+                create_smart_tunnel(dungeon, partitions, rooms, i, t[j]);
             }
         }
     }
@@ -180,12 +181,11 @@ function create_smart_tunnel(array, partitions, rooms, firstRoom, secondRoom){
     let thatP = partitions[secondRoom];
 
     let firstCoord = {x: -1, y: -1};
-    let midCoord = {x: -1, y: -1};
     let secondCoord = {x: -1, y: -1};
 
     let coordArr = [];
     // axisAdj is adjacent coords, axisOffset are offset coords
-    let axisAdj, axisOffset;
+    let axisAdj, axisOffset, firstRoomLength, secondRoomLength;
 
     // If secondRoom is to the right of firstRoom
     if(partition_adj_check(thisP.x2,thatP.x1,thisP.y1,thisP.y2,thatP.y1,thatP.y2)){
@@ -193,6 +193,9 @@ function create_smart_tunnel(array, partitions, rooms, firstRoom, secondRoom){
         coordArr = [thisP.y1, thisP.y2, thatP.y1, thatP.y2];
         axisAdj = "x";
         axisOffset = "y";
+
+        firstRoomLength = rooms[firstRoom].width;
+        secondRoomLength = rooms[secondRoom].width;
     }
     // If secondRoom is below firstRoom
     else if(partition_adj_check(thisP.y2,thatP.y1,thisP.x1,thisP.x2,thatP.x1,thatP.x2)){
@@ -200,15 +203,31 @@ function create_smart_tunnel(array, partitions, rooms, firstRoom, secondRoom){
         coordArr = [thisP.x1,thisP.x2,thatP.x1,thatP.x2];
         axisAdj = "y";
         axisOffset = "x";
+
+        firstRoomLength = rooms[firstRoom].height;
+        secondRoomLength = rooms[secondRoom].height;
     }
 
     coordArr.sort();
 
-    midCoord[axisAdj] = thisP.x2;
-    midCoord[axisOffset] = randIntRange(coordArr[1], coordArr[2]);
+    let chosenAxisOffset = randIntRange(coordArr[1], coordArr[2]);
 
-    firstCoord[axisOffset] = midCoord[axisOffset];
-    secondCoord[axisOffset] = midCoord[axisOffset];
+    firstCoord[axisOffset] = chosenAxisOffset;
+    secondCoord[axisOffset] = chosenAxisOffset;
+
+    firstCoord[axisAdj] = rooms[firstRoom][axisAdj] + randInt(firstRoomLength);
+    secondCoord[axisAdj] = rooms[secondRoom][axisAdj] + randInt(secondRoomLength);
+
+    if(axisAdj === "x"){
+        create_tunnel(array, firstCoord.x,rooms[firstRoom].y,firstCoord.x,firstCoord.y);
+        create_tunnel(array, firstCoord.x,firstCoord.y,secondCoord.x,secondCoord.y);
+        create_tunnel(array, secondCoord.x,secondCoord.y,secondCoord.x,rooms[secondRoom].y);
+    }
+    else{
+        create_tunnel(array, rooms[firstRoom].x,firstCoord.y,firstCoord.x,firstCoord.y);
+        create_tunnel(array, firstCoord.x,firstCoord.y,secondCoord.x,secondCoord.y);
+        create_tunnel(array, secondCoord.x,secondCoord.y,rooms[secondRoom].x,secondCoord.y);
+    }
 }
 
 function create_bend (array, xroom1, yroom1, xroom2, yroom2){
@@ -237,21 +256,21 @@ function create_room (array, xOrigin, yOrigin,width,height) {
 }
 
 // r = room
-function create_tunnel (array, xOrigin, yOrigin, xroom, yroom){
+function create_tunnel (array, xOrigin, yOrigin, xEnd, yEnd){
     //console.log("tunnel: (" + xOrigin + ", " + yOrigin + ") , (" + xroom + ", " + yroom + ")");
 
-    let xtunnel = Math.min(xOrigin,xroom);
-    let ytunnel = Math.min(yOrigin,yroom);
+    let xtunnel = Math.min(xOrigin,xEnd);
+    let ytunnel = Math.min(yOrigin,yEnd);
 
     let xwidth;
     let yheight;
-    if(xOrigin != xroom){
-        xwidth = Math.abs(xOrigin - xroom);
+    if(xOrigin != xEnd){
+        xwidth = Math.abs(xOrigin - xEnd) + 1;
         yheight = 1;
     }
     else{
         xwidth = 1;
-        yheight = Math.abs(yOrigin - yroom + 1);
+        yheight = Math.abs(yOrigin - yEnd) + 1;
     }
     
     create_room(array,xtunnel,ytunnel,xwidth,yheight);
@@ -303,16 +322,29 @@ function partition_rooms(array, X0,Y0,X,Y,ROOMS){
         array.push(cell);
         return;
     }
-    var part1 = Math.floor(ROOMS/2);
-    var part2 = ROOMS - part1;
 
-    if(ROOMS % 2 == 0){
+    var part1, part2
+
+    if(randInt(1) % 2 == 0){
+        part1 = Math.floor(ROOMS/2);
+    }
+    else{
+        part1 = Math.ceil(ROOMS/2);
+    }
+    part2 = ROOMS - part1;
+
+    let pWidth = Math.abs(X0 - X);
+    let pLength = Math.abs(Y0 - Y);
+
+    // Splits into left/right rooms
+    if(pWidth > pLength){
         var split = divide_partition(X0,X,part1,part2)
         partition_rooms(array, X0,Y0,split,Y,part1);
         partition_rooms(array, split,Y0,X,Y,part2)
         return;
     }
-    if(ROOMS % 2 == 1){
+    // Splits into up/down rooms
+    else{
         var split = divide_partition(Y0,Y,part1,part2);
         partition_rooms(array, X0,Y0,X,split,part1);
         partition_rooms(array, X0,split,X,Y,part2);
@@ -321,10 +353,13 @@ function partition_rooms(array, X0,Y0,X,Y,ROOMS){
 }
 
 function divide_partition (low,high,rooms1,rooms2){
-    var lower_bound = low + (5 * rooms1);
-    var upper_bound = high - (5 * rooms2);
-    if(lower_bound > upper_bound){
-        //throw an error
+    var lower_bound = low;
+    var upper_bound = high;
+    if(Math.abs(high-low) > 5 * (rooms1 + rooms2)){
+        lower_bound += (5 * rooms1);
+        upper_bound -= (5 * rooms2);
+        return randIntRange(lower_bound,upper_bound);
     }
-    return randIntRange(lower_bound,upper_bound);
+    
+    return Math.floor((lower_bound + upper_bound) / 2);
 }
