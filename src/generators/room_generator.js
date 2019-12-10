@@ -9,7 +9,7 @@ export function graph_dungeon (params) {
     // TODO: implement this
 
     let rooms = [];
-    let numRooms = 15;
+    let numRooms = 50;
 
     let dungeon = new Array2d(width,height);
 
@@ -173,23 +173,42 @@ function carve_new_tunnel(incomplete, rooms, dfs_result) {
             return;
         }
     }
+}
 
-    // Iterate through all rooms that are disconnected
-    /*for(let i = 0; i < incomplete.length; ++i){
-        // Iterate through a room's edges
-        // incomplete[i] returns a rooms index
-        let r = rooms[incomplete[i]];
-        let e = r.edges;
-        // e[j] returns a room's index
-        for(let j = 0; j < e.length; ++j){
-            // If this is unvisited and j is visited...
-            if(dfs_result[e[j]] === true){
-                r.tunnels.push(e[j]);
-                rooms[j].tunnels.push(incomplete[i]);
-                return;
-            }
-        }
-    }*/
+function create_smart_tunnel(array, partitions, rooms, firstRoom, secondRoom){
+    let thisP = partitions[firstRoom];
+    let thatP = partitions[secondRoom];
+
+    let firstCoord = {x: -1, y: -1};
+    let midCoord = {x: -1, y: -1};
+    let secondCoord = {x: -1, y: -1};
+
+    let coordArr = [];
+    // axisAdj is adjacent coords, axisOffset are offset coords
+    let axisAdj, axisOffset;
+
+    // If secondRoom is to the right of firstRoom
+    if(partition_adj_check(thisP.x2,thatP.x1,thisP.y1,thisP.y2,thatP.y1,thatP.y2)){
+        // Sort y coords in order and grab middle 2
+        coordArr = [thisP.y1, thisP.y2, thatP.y1, thatP.y2];
+        axisAdj = "x";
+        axisOffset = "y";
+    }
+    // If secondRoom is below firstRoom
+    else if(partition_adj_check(thisP.y2,thatP.y1,thisP.x1,thisP.x2,thatP.x1,thatP.x2)){
+        // Sort x coords in order and grab middle 2
+        coordArr = [thisP.x1,thisP.x2,thatP.x1,thatP.x2];
+        axisAdj = "y";
+        axisOffset = "x";
+    }
+
+    coordArr.sort();
+
+    midCoord[axisAdj] = thisP.x2;
+    midCoord[axisOffset] = randIntRange(coordArr[1], coordArr[2]);
+
+    firstCoord[axisOffset] = midCoord[axisOffset];
+    secondCoord[axisOffset] = midCoord[axisOffset];
 }
 
 function create_bend (array, xroom1, yroom1, xroom2, yroom2){
