@@ -1,15 +1,14 @@
 import { Array2d } from '../core/array2d'
+import { get } from '../core/array2d'
+import { set } from '../core/array2d'
 import { randInt } from '../core/random'
 import { randIntRange } from '../core/random'
 
 
 export function graph_dungeon (params) {
-    const { width, height } = params;
-
-    // TODO: implement this
+    const { width, height, numberOfRooms } = params;
 
     let rooms = [];
-    let numRooms = 50;
 
     let dungeon = new Array2d(width,height);
 
@@ -20,9 +19,12 @@ export function graph_dungeon (params) {
     // Multiply each coord by some multiplier
     // Populate partitions rooms
     let partitions = [];
-    partition_rooms(partitions,0,0,width - 1,height - 1,numRooms);
+    partition_rooms(partitions,0,0,width - 1,height - 1,numberOfRooms);
 
     console.log(partitions);
+
+    // If the partitions comes out to less than the desired number
+    let numRooms = partitions.length;
 
     // Pick random locations for room
     for(let i = 0; i < numRooms; ++i){
@@ -46,15 +48,17 @@ export function graph_dungeon (params) {
             r.y = p.y1 + 1;
         }
         else{
-            r.width = randIntRange(1,Math.abs(p.x1-p.x2)-1);
-            r.height = randIntRange(1,Math.abs(p.y1-p.y2)-1);
+            let minXSize = Math.min(3,Math.abs(p.x1-p.x2)-1);
+            let minYSize = Math.min(3,Math.abs(p.y1-p.y2)-1);
+            r.width = randIntRange(minXSize,Math.abs(p.x1-p.x2)-1);
+            r.height = randIntRange(minYSize,Math.abs(p.y1-p.y2)-1);
             r.x = randIntRange(p.x1 + 1,p.x2 - r.width - 1);
             r.y = randIntRange(p.y1 + 1,p.y2 - r.height - 1);
         }
         
         //console.log("room " + i + ": " + r.width + " " + r.height + ", " + r.x + " " + r.y);
-        console.log("room " + i);
-        console.log(r);
+        //console.log("room " + i);
+        //console.log(r);
     }
 
     // Create graph alg here
@@ -134,6 +138,7 @@ export function graph_dungeon (params) {
     // Dig tunnels
     for(let i = 0; i < numRooms; ++i){
         let t = rooms[i].tunnels;
+        //if(i < 25 || i > 25) continue;
         for(let j = 0; j < t.length; ++j){
             // any index t[j] is less than i has already been dug
             if(i < t[j]){
@@ -148,15 +153,42 @@ export function graph_dungeon (params) {
     }
 
     // Pick end and start rooms
+    let start = {x: -1, y: -1};
+    let end = {x: -1, y: -1};
+    let key = {x: -1, y: -1};
 
-    for(let i = 0; i < numRooms; ++i){
+    let startRoom = randInt(Math.floor(numRooms*.1));
+    let endRoom = numRooms - randInt(Math.floor(numRooms*.1)) - 1;
+    let keyRoom = randIntRange(Math.floor(numRooms*.4),Math.floor(numRooms*.6));
+
+    console.log(startRoom + " " + endRoom + " " + keyRoom);
+
+    start.x = rooms[startRoom].x + randInt(rooms[startRoom].width - 1);
+    start.y = rooms[startRoom].y + randInt(rooms[startRoom].height - 1);
+
+    end.x = rooms[endRoom].x + randInt(rooms[endRoom].width - 1);
+    end.y = rooms[endRoom].y + randInt(rooms[endRoom].height - 1);
+
+    key.x = rooms[keyRoom].x + randInt(rooms[keyRoom].width - 1);
+    key.y = rooms[keyRoom].y + randInt(rooms[keyRoom].height - 1);
+
+    /*for(let i = 0; i < numRooms; ++i){
         console.log("end room " + i);
         console.log(rooms[i]);
-    }
+    }*/
+    console.log(start);
+    console.log(end);
+    console.log(key);
 
-    return dungeon;
+    return {
+        dungeon: dungeon,
+        start: start,
+        end: end,
+        key: key,
+    };
 }
 
+// Adds a new tunnel to a room's tunnels array
 function carve_new_tunnel(incomplete, rooms, dfs_result) {
     let chosenIndex = randInt(incomplete.length - 1); // index of incomplete
     let chosenRoom = incomplete[chosenIndex]; // index of rooms
@@ -176,6 +208,106 @@ function carve_new_tunnel(incomplete, rooms, dfs_result) {
     }
 }
 
+function create_gradual_tunnel_base(array, direction,
+                                    room1X, room1Y,
+                                    firstCoordX, firstCoordY,
+                                    secondCoordX, secondCoordY,
+                                    room2X, room2Y){
+    let seenWalls = {status: false,};
+    let wallStatus;
+
+    // So I can make use of break
+    for(let i = 0; i < 1; ++i){
+        if(direction === "x"){
+            wallStatus = create_gradual_tunnel(array, secondCoordX,room2Y,secondCoordX,secondCoordY, seenWalls);
+            //wallStatus = create_tunnel(array, firstCoordX,room1Y,firstCoordX,firstCoordY, seenWalls);
+            if(wallStatus === 1){
+                break;
+            }
+            wallStatus = create_gradual_tunnel(array, secondCoordX,secondCoordY,firstCoordX,firstCoordY, seenWalls);
+            //wallStatus = create_tunnel(array, firstCoordX,firstCoordY,secondCoordX,secondCoordY, seenWalls);
+            if(wallStatus === 1){
+                break;
+            }
+            wallStatus = create_gradual_tunnel(array, firstCoordX,firstCoordY,firstCoordX,room1Y, seenWalls);
+            //wallStatus = create_tunnel(array, secondCoordX,secondCoordY,secondCoordX,room2Y, seenWalls);
+        }
+        else{
+            wallStatus = create_gradual_tunnel(array, room2X,secondCoordY,secondCoordX,secondCoordY, seenWalls);
+            //wallStatus = create_tunnel(array, room1X,firstCoordY,firstCoordX,firstCoordY, seenWalls);
+            if(wallStatus === 1){
+                break;
+            }
+            wallStatus = create_gradual_tunnel(array, secondCoordX,secondCoordY,firstCoordX,firstCoordY, seenWalls);
+            //wallStatus = create_tunnel(array, firstCoordX,firstCoordY,secondCoordX,secondCoordY, seenWalls);
+            if(wallStatus === 1){
+                break;
+            }
+            wallStatus = create_gradual_tunnel(array, room2X,secondCoordY,secondCoordX,secondCoordY, seenWalls);
+            //wallStatus = create_tunnel(array, secondCoordX,secondCoordY,room2X,secondCoordY, seenWalls);
+        }
+    }
+    
+}
+
+// Digs a new tunnel that stops if encountered a tunnel
+function create_gradual_tunnel (array, xOrigin, yOrigin, xEnd, yEnd, seenWalls){
+    //console.log("tunnel: (" + xOrigin + ", " + yOrigin + ") , (" + xroom + ", " + yroom + ")");
+
+    let xtunnel = Math.min(xOrigin,xEnd);
+    let ytunnel = Math.min(yOrigin,yEnd);
+
+    let tunnelLength;
+    let tunnelDir;
+    // Dig in the X direction
+    if(xOrigin != xEnd){
+        tunnelLength = Math.abs(xOrigin - xEnd) + 1;
+        tunnelDir = Math.sign(xEnd - xOrigin);
+        for(let i = 1; i < tunnelLength; ++i){
+            if(array.get(xOrigin + tunnelDir*i, yOrigin) === 0){
+                // Check to see if it's in a room or in a tunnel
+                if(seenWalls.status === true){
+                    // encountered a tunnel while digging
+                    return 1;
+                }
+                // else, I haven't started digging yet
+            }
+            else{
+                // I have started digging!
+                seenWalls.status = true;
+                array.set(xOrigin + tunnelDir*i, yOrigin, 0);
+            }
+        }
+    }
+    // Dig in the Y direction
+    else if(yOrigin != yEnd){
+        tunnelLength = Math.abs(yOrigin - yEnd) + 1;
+        tunnelDir = Math.sign(yEnd - yOrigin);
+        for(let i = 1; i < tunnelLength; ++i){
+            if(array.get(xOrigin, yOrigin + tunnelDir*i) === 0){
+                // Check to see if it's in a room or in a tunnel
+                if(seenWalls.status === true){
+                    // encountered a tunnel while digging
+                    return 1;
+                }
+                // else, I haven't started digging yet
+            }
+            else{
+                // I have started digging!
+                seenWalls.status = true;
+                array.set(xOrigin, yOrigin + tunnelDir*i, 0);
+            }
+        }
+    }
+    else{
+        console.log("error: some coords enterred wrong in create_gradual_tunnel()");
+    }
+
+    // Encountered no tunnels
+    return 0;
+}
+
+// Creates tunnels that do not intersect with rooms
 function create_smart_tunnel(array, partitions, rooms, firstRoom, secondRoom){
     let thisP = partitions[firstRoom];
     let thatP = partitions[secondRoom];
@@ -218,7 +350,12 @@ function create_smart_tunnel(array, partitions, rooms, firstRoom, secondRoom){
     firstCoord[axisAdj] = rooms[firstRoom][axisAdj] + randInt(firstRoomLength);
     secondCoord[axisAdj] = rooms[secondRoom][axisAdj] + randInt(secondRoomLength);
 
-    if(axisAdj === "x"){
+    create_gradual_tunnel_base(array, axisAdj,
+                                    rooms[firstRoom].x, rooms[firstRoom].y,
+                                    firstCoord.x, firstCoord.y,
+                                    secondCoord.x, secondCoord.y,
+                                    rooms[secondRoom].x, rooms[secondRoom].y);
+    /*if(axisAdj === "x"){
         create_tunnel(array, firstCoord.x,rooms[firstRoom].y,firstCoord.x,firstCoord.y);
         create_tunnel(array, firstCoord.x,firstCoord.y,secondCoord.x,secondCoord.y);
         create_tunnel(array, secondCoord.x,secondCoord.y,secondCoord.x,rooms[secondRoom].y);
@@ -227,7 +364,7 @@ function create_smart_tunnel(array, partitions, rooms, firstRoom, secondRoom){
         create_tunnel(array, rooms[firstRoom].x,firstCoord.y,firstCoord.x,firstCoord.y);
         create_tunnel(array, firstCoord.x,firstCoord.y,secondCoord.x,secondCoord.y);
         create_tunnel(array, secondCoord.x,secondCoord.y,rooms[secondRoom].x,secondCoord.y);
-    }
+    }*/
 }
 
 function create_bend (array, xroom1, yroom1, xroom2, yroom2){
@@ -300,9 +437,10 @@ function dfs_recursive(rooms, visited, position){
     }
 }
 
+//https://stackoverflow.com/questions/325933/determine-whether-two-date-ranges-overlap
 function partition_adj_check(thisx1,thatx2,thisy1,thisy2,thaty1,thaty2){
     if(thisx1 === thatx2){
-        return (thisy1 <= thaty2 && thisy2 >= thaty1);
+        return (thisy1 < thaty2 && thisy2 > thaty1);
     }
     return false;
 }
@@ -339,6 +477,16 @@ function partition_rooms(array, X0,Y0,X,Y,ROOMS){
     // Splits into left/right rooms
     if(pWidth > pLength){
         var split = divide_partition(X0,X,part1,part2)
+        if(split === -1){
+            let cell = {
+                x1: X0,
+                y1: Y0,
+                x2: X,
+                y2: Y,
+            }
+            array.push(cell);
+            return;
+        }
         partition_rooms(array, X0,Y0,split,Y,part1);
         partition_rooms(array, split,Y0,X,Y,part2)
         return;
@@ -346,6 +494,16 @@ function partition_rooms(array, X0,Y0,X,Y,ROOMS){
     // Splits into up/down rooms
     else{
         var split = divide_partition(Y0,Y,part1,part2);
+        if(split === -1){
+            let cell = {
+                x1: X0,
+                y1: Y0,
+                x2: X,
+                y2: Y,
+            }
+            array.push(cell);
+            return;
+        }
         partition_rooms(array, X0,Y0,X,split,part1);
         partition_rooms(array, X0,split,X,Y,part2);
         return;
@@ -355,11 +513,12 @@ function partition_rooms(array, X0,Y0,X,Y,ROOMS){
 function divide_partition (low,high,rooms1,rooms2){
     var lower_bound = low;
     var upper_bound = high;
-    if(Math.abs(high-low) > 5 * (rooms1 + rooms2)){
-        lower_bound += (5 * rooms1);
-        upper_bound -= (5 * rooms2);
+    var diff = Math.abs(high-low);
+    if(diff > 4){
+        lower_bound += Math.floor(diff*.25);
+        upper_bound -= Math.floor(diff*.25);
+        //console.log(lower_bound + " " + upper_bound);
         return randIntRange(lower_bound,upper_bound);
     }
-    
-    return Math.floor((lower_bound + upper_bound) / 2);
+    return -1;
 }
