@@ -11,7 +11,7 @@ random:
   useFixedSeed: false
 
 camera:
-  zoom: 0.4
+  zoom: 1.0
   origin: -3000
   width: 5000
   speed: 2.0

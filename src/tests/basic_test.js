@@ -11,8 +11,7 @@ start(() => {
         
         create: function() {
             // manually set dungeon size + camera zoom (override config...?)
-            console.log("hoopla");
-            this.camera.zoom = 0.4;
+            //this.camera.zoom = 0.4;
             dungeon.width = 20;
             dungeon.height = 20;
             let tiles = basic_dungeon(dungeon);
@@ -22,17 +21,15 @@ start(() => {
                 tileset: TILESET
             });           
 
-
-            const clickButton = this.add.text(100, 100, 'Click me!', { fill: '#0f0' })
+            var clickButton = this.add.text(this.camera.x, this.camera.y, 'RESTART', { fill: '#0f0' })
               .setInteractive()
               .on('pointerdown', function() {
                 document.location.reload();
                 console.log(game.scene);
             });
-
-              /*
-            let restartKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
-            restartKey.on('down', )*/
+            clickButton.setScrollFactor(0);
+            console.log(clickButton.x, "fixedToCamera");        
         },
+        
     })
 })
