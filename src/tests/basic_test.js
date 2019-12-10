@@ -25,7 +25,7 @@ start(() => {
             });
             
             let pathfinder = search(tiles.dungeon, tiles.start, tiles.end);
-            //console.log(pathfinder, "pathfinder");
+            //console.log(pathfinder,pathfinder.length, "pathfinder");
 
             let path = convert_path(pathfinder,dungeon.width,dungeon.height);
 

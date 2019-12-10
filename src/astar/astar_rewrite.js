@@ -149,7 +149,8 @@ export function search(grid, start, end) {
 }
 
 export function convert_path(path, width, height){
-	
+	path.pop();
+	//console.log(path, path.length,"Shorter Path in convert_path");
     let newPath = new Array2d(width,height);
         newPath.fill((x,y) => {
             return 0;
