@@ -7,11 +7,12 @@ dungeon:
   height: 30
 
 random:
-  seed: 8ae8865c461f77fd321851c830f
-  useFixedSeed: false
+  seed: 8ae8865c461f77fd321851c830f8bbeb49df254d
+  useFixedSeed: true
+
 
 camera:
   zoom: 0.4
-  origin: -2000
-  width: 4000
+  origin: -3000
+  width: 7000
   speed: 2.0
