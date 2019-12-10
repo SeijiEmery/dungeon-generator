@@ -55,8 +55,8 @@ export function graph_dungeon (params) {
         }
         
         //console.log("room " + i + ": " + r.width + " " + r.height + ", " + r.x + " " + r.y);
-        console.log("room " + i);
-        console.log(r);
+        //console.log("room " + i);
+        //console.log(r);
     }
 
     // Create graph alg here
@@ -151,13 +151,39 @@ export function graph_dungeon (params) {
     }
 
     // Pick end and start rooms
+    let start = {x: -1, y: -1};
+    let end = {x: -1, y: -1};
+    let key = {x: -1, y: -1};
 
-    for(let i = 0; i < numRooms; ++i){
+    let startRoom = randInt(Math.floor(numRooms*.1));
+    let endRoom = numRooms - randInt(Math.floor(numRooms*.1)) - 1;
+    let keyRoom = randIntRange(Math.floor(numRooms*.4),Math.floor(numRooms*.6));
+
+    console.log(startRoom + " " + endRoom + " " + keyRoom);
+
+    start.x = rooms[startRoom].x + randInt(rooms[startRoom].width - 1);
+    start.y = rooms[startRoom].y + randInt(rooms[startRoom].height - 1);
+
+    end.x = rooms[endRoom].x + randInt(rooms[endRoom].width - 1);
+    end.y = rooms[endRoom].y + randInt(rooms[endRoom].height - 1);
+
+    key.x = rooms[keyRoom].x + randInt(rooms[keyRoom].width - 1);
+    key.y = rooms[keyRoom].y + randInt(rooms[keyRoom].height - 1);
+
+    /*for(let i = 0; i < numRooms; ++i){
         console.log("end room " + i);
         console.log(rooms[i]);
-    }
+    }*/
+    console.log(start);
+    console.log(end);
+    console.log(key);
 
-    return dungeon;
+    return {
+        dungeon: dungeon,
+        start: start,
+        end: end,
+        key: key,
+    };
 }
 
 function carve_new_tunnel(incomplete, rooms, dfs_result) {
@@ -303,6 +329,7 @@ function dfs_recursive(rooms, visited, position){
     }
 }
 
+//https://stackoverflow.com/questions/325933/determine-whether-two-date-ranges-overlap
 function partition_adj_check(thisx1,thatx2,thisy1,thisy2,thaty1,thaty2){
     if(thisx1 === thatx2){
         return (thisy1 < thaty2 && thisy2 > thaty1);
