@@ -8,8 +8,10 @@ import { dungeon } from '../generated/config'
 const TILESET = [ "barrel_E" ];
 start(() => {
     const game = runPhaser({
+        
         create: function() {
             // manually set dungeon size + camera zoom (override config...?)
+            console.log("hoopla");
             this.camera.zoom = 0.4;
             dungeon.width = 20;
             dungeon.height = 20;
@@ -18,7 +20,19 @@ start(() => {
                 grid: tiles,
                 spacing: 60,
                 tileset: TILESET
+            });           
+
+
+            const clickButton = this.add.text(100, 100, 'Click me!', { fill: '#0f0' })
+              .setInteractive()
+              .on('pointerdown', function() {
+                document.location.reload();
+                console.log(game.scene);
             });
-        }
+
+              /*
+            let restartKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
+            restartKey.on('down', )*/
+        },
     })
 })
