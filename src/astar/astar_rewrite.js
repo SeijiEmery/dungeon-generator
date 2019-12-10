@@ -52,7 +52,7 @@ export function search(grid, start, end) {
 		var openList = [];
 		var closedList = [];
 		openList.push(grid.get(start.x,start.y));
-		console.log(openList,openList.length, "Start Push");
+		//console.log(openList,openList.length, "Start Push");
 		var test_length = 20;
 		var pushCount = 0;
 		while(openList.length > 0){ //change with openList.length > 0
@@ -80,7 +80,7 @@ export function search(grid, start, end) {
 			var m = 0;
 			for( m; m < openList.length; m++){
 				if(openList[m]==currentNode){
-					console.log(currentNode);
+					//console.log(currentNode);
 					openList.splice(m,1);
 					break;
 				}
@@ -89,10 +89,10 @@ export function search(grid, start, end) {
 
 
 			closedList.push(currentNode);
-			console.log(closedList,closedList.length, "Add to closedList");
+			//console.log(closedList,closedList.length, "Add to closedList");
 
 			var neighbors = getNeighbors(grid, currentNode);
-			console.log(neighbors);
+			//console.log(neighbors);
 			
 			for (var i = 0; i < neighbors.length; i++) {
 				var neighbor = neighbors[i];
@@ -125,10 +125,10 @@ export function search(grid, start, end) {
 					gScoreIsBest = true;
 		         	neighbor.h = heuristic(neighbor, end);
 		         	//WE SOMEHOW PUSH NEIGHBORS THAT ARE WALLS//
-		         	console.log(neighbor, "heuristic");
+		         	//console.log(neighbor, "heuristic");
 		         	openList.push(neighbor);
 		         	pushCount++;
-		         	console.log(openList.length, "Added to openList");
+		         	//console.log(openList.length, "Added to openList");
 	        	}
 	        	   	
 		        else if(gScore < neighbor.g) {
@@ -145,6 +145,6 @@ export function search(grid, start, end) {
 		        }
 			}
 		}
-		console.log(pushCount);
-		return "fail";
+		//console.log(pushCount);
+		return [];
 }
