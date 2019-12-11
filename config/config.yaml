@@ -1,10 +1,11 @@
 window:
-  width: 800
-  height: 800
+  width: 2000
+  height: 1000
 
 dungeon:
-  width: 30
-  height: 30
+  width: 40
+  height: 40
+  rooms: 20
 
 random:
   seed: 8ae8865c461f77fd321851c830f8bbeb49df254d
@@ -12,7 +13,7 @@ random:
 
 
 camera:
-  zoom: 1.0
-  origin: -3000
-  width: 7000
-  speed: 2.0
+  zoom: 0.4
+  origin: -10000
+  width: 20000
+  speed: 3.0
