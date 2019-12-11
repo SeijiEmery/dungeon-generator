@@ -9,10 +9,18 @@
 
 #define THROW(...) throw backtraced_exception(format(__VA_ARGS__))
 #define ENFORCE(expr, ...) if (!(expr)) { THROW(__VA_ARGS__); }
+#define ENFORCE_WITH(Exception, expr, ...) \
+    if (!(expr)) { throw Exception(format(__VA_ARGS__)); }
 
 static void errorCallback(int error, const char* description) {
     fprintf(stderr, "GLFW error %d: %s\n", error, description);
 }
+
+#define DEFINE_EXCEPTION(name) \
+class name : public backtraced_exception { \
+public: \
+    name (const std::string& what) : backtraced_exception(what) {} \
+};
 
 #ifdef SHOW_BACKTRACE
     #include <execinfo.h>
@@ -100,6 +108,7 @@ static void errorCallback(int error, const char* description) {
         }
         static void maybeSetupSignalHandlers () {
             signal(SIGSEGV, signalHandler);
+            signal(SIGABRT, signalHandler);
         }
     #endif
 #else
@@ -113,7 +122,7 @@ static void errorCallback(int error, const char* description) {
 #endif
 
 
-class backtraced_exception : std::runtime_error {
+class backtraced_exception : public std::runtime_error {
     TraceInfo traceInfo;
 public:
     backtraced_exception (const std::string& what)

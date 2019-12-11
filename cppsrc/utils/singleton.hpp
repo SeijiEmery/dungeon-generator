@@ -17,8 +17,7 @@ struct SingletonOf {
     }
     template <typename... Args>
     static void teardown (Args... args) {
-        assert(instance != nullptr);
-        delete instance;
+        if (instance) delete instance;
         instance = nullptr;
     }
 };
