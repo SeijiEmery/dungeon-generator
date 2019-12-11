@@ -19,16 +19,7 @@ start(() => {
                 grid: tiles,
                 spacing: 60,
                 tileset: TILESET
-            });           
-
-            var clickButton = this.add.text(this.camera.x, this.camera.y, 'RESTART', { fill: '#0f0' })
-              .setInteractive()
-              .on('pointerdown', function() {
-                document.location.reload();
-                console.log(game.scene);
-            });
-            clickButton.setScrollFactor(0);
-            console.log(clickButton.x, "fixedToCamera");        
+            });                
         },
         
     })
