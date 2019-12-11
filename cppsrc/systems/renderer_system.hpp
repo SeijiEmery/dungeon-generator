@@ -1,17 +1,21 @@
 #pragma once
 #include "../utils/all_includes.hpp"
 
+#ifdef __APPLE__
+#include <OpenGL/gl3.h>
+#include <OpenGL/gl3ext.h>
+#endif
+
 DEFINE_EXCEPTION(GLRuntimeException)
 DEFINE_EXCEPTION(ShaderCompileException)
 DEFINE_EXCEPTION(ShaderLinkException)
 
 static const char* VERTEX_SHADER_SRC = R"SHADER(
 #version 410
-uniform mat4 MVP;
-in vec3 vertexPos;
+in vec2 vertexPos;
 
 void main () {
-    gl_Position = MVP * vec4(vertexPos, 1.0);
+    gl_Position = vec4(vertexPos, 0.0, 1.0);
 }
 )SHADER";
 
@@ -19,7 +23,7 @@ static const char* FRAGMENT_SHADER_SRC = R"SHADER(
 #version 410
 out vec4 fragColor;
 void main () {
-    fragColor = vec4(1, 0, 1, 1);
+    fragColor = vec4(1, 1, 1, 1);
 }
 )SHADER";
 
@@ -113,22 +117,93 @@ public:
             program = 0;
         }
     }
+    void bind () {
+        glUseProgram(program);
+    }
+};
+
+class VBO {
+    GLuint buffer = 0;
+    GLenum target = 0;
+public:
+    void create (GLenum bufferTarget) {
+        assert(!buffer);
+        target = bufferTarget;
+        glGenBuffers(1, &buffer);
+        glCheckErrors("glGenBuffers");
+    }
+    void bind () {
+        if (buffer) {
+            glBindBuffer(target, buffer);
+            glCheckErrors("glBindBuffer");
+        }
+    }
+    void load (GLenum bufferTarget, GLenum usage, size_t size, const void* data) {
+        create(bufferTarget);
+        bind();
+        glBufferData(bufferTarget, size, data, usage);
+        glCheckErrors("glBufferData");
+    }
+    void destroy () {
+        if (buffer) {
+            glDeleteBuffers(1, &buffer);
+            glCheckErrors("glDeleteBuffers");
+        }  
+    }
+    ~VBO () {
+        destroy();
+    }
+};
+
+class QuadMesh {
+    VBO vertices, indices;
+    GLuint vao;
+
+    constexpr static GLfloat VERTICES[] = { 
+        -0.5, -0.5, 
+        -0.5, +0.5,
+        +0.5, +0.5,
+        -0.5, -0.5,
+        +0.5, +0.5,
+        +0.5, -0.5,
+    };
+    constexpr static GLubyte INDICES[] = {
+        0, 1, 2, 0, 2, 3
+    };
+public:
+    void load () {
+        glGenVertexArrays(1, &vao); glCheckErrors("glGenVertexArrays");
+        glBindVertexArray(vao); glCheckErrors("glBindVertexArray");    
+        vertices.load( GL_ARRAY_BUFFER, GL_STATIC_DRAW, sizeof(VERTICES), &VERTICES[0] );
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, NULL); glCheckErrors("glVertexAttribPointer");
+        glEnableVertexAttribArray(0); glCheckErrors("glEnableVertexAttribArray");
+        glBindVertexArray(0); glCheckErrors("glBindVertexArray");
+    }
+    void bind () {
+        glBindVertexArray(vao); glCheckErrors("glBindVertexArray");
+    }
+    void draw () {
+        glDrawArrays(GL_TRIANGLES, 0, 6); glCheckErrors("glDrawArrays");
+    }
 };
 
 struct RendererSystem {
     ShaderProgram program;
-    GLuint quadVbo = 0;
-    GLuint quadFbo = 0;
+    QuadMesh quad;
 
     RendererSystem () {
         printf("running on opengl %s\n", glGetString(GL_VERSION));
         program.load(VERTEX_SHADER_SRC, FRAGMENT_SHADER_SRC);
+        quad.load();
         printf("init renderer!\n");
-    }
-    ~RendererSystem () {
-        printf("teardown renderer!\n");
     }
     void update () {
         printf("update renderer!\n");
+        program.bind();
+        quad.bind();
+        quad.draw();
+    }
+    ~RendererSystem () {
+        printf("teardown renderer!\n");
     }
 };
