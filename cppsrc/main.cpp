@@ -25,43 +25,49 @@ std::string format(const char* fmt, ...) {
 }
 
 #define THROW(...) throw std::runtime_error(format(__VA_ARGS__))
+#define ENFORCE(expr, ...) if (!(expr)) { THROW(__VA_ARGS__); }
 
-int main(int argc, char *argv[]) {
-    if (!glfwInit()) {
-        fprintf(stderr, "Failed to initialize glfw!\n");
-        exit(-1);
+class Application {
+    GLFWwindow* window = nullptr;
+public:
+    Application () {
+        ENFORCE(glfwInit(), "Failed to initialize glfw!");
+        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+        glfwWindowHint(GLFW_DOUBLEBUFFER, GL_TRUE);
+        window = glfwCreateWindow(
+            WINDOW_WIDTH, WINDOW_HEIGHT,
+            "dungeon-generator", NULL, NULL);
+        ENFORCE(window != nullptr, "Failed to create GLFW window\n");
     }
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
-    glfwWindowHint(GLFW_DOUBLEBUFFER, GL_TRUE);
-    GLFWwindow* window = glfwCreateWindow(
-        WINDOW_WIDTH, WINDOW_HEIGHT,
-        "dungeon-generator", NULL, NULL);
-    if (window == nullptr) {
-        fprintf(stderr, "Failed to create GLFW window\n");
-        exit(-1);
+    ~Application() {
+        if (!window) { glfwDestroyWindow(window); }
+        glfwTerminate();
     }
-
-    glfwMakeContextCurrent(window);
-    glfwSwapInterval(1);
-
-    ENFORCE_CRITICAL(window != nullptr,
-        "Failed to create GLFW window");
-
-    try {
+    void run () {
+        glfwMakeContextCurrent(window);
+        glfwSwapInterval(1);
         while (!glfwWindowShouldClose(window)) {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            update();
             glfwSwapBuffers(window);
             glfwPollEvents();
         }
-        THROW("fubar %s %d %0.2f", "bar", 10, 0.25);
-        throw std::runtime_error("fubar");
+    }
+private:
+    void update () {
+
+    }
+};
+
+int main(int argc, char *argv[]) {
+    try {
+        Application().run();
     } catch (const std::exception& e) {
         fprintf(stderr, "terminated with error:\n\t%s\n", e.what());
+        exit(-1);
     }
-    glfwDestroyWindow(window);
-    glfwTerminate();
     return 0;
 }
