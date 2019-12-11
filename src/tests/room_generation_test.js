@@ -13,9 +13,7 @@ start(() => {
         create: function() {
             // manually set dungeon size + camera zoom (override config...?)
             this.camera.zoom = 0.4;
-            dungeon.width = config.dungeon.width;
-            dungeon.height = config.dungeon.height;
-            dungeon.numberOfRooms = config.dungeon.rooms;
+            dungeon.numberOfRooms = dungeon.rooms;
             let output = graph_dungeon(dungeon);
             let tiles = output.dungeon;
             console.log(output,"OUTPUT");
