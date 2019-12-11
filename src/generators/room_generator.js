@@ -176,21 +176,34 @@ export function graph_dungeon (params) {
         console.log("end room " + i);
         console.log(rooms[i]);
     }*/
+    
+    /*let objects = [];
+    objects[0] = {
+        type: "start",
+        x: start.x,
+        y: start.y,
+    }
+    objects[1] = {
+        type: "end",
+        x: end.x,
+        y: end.y,
+    }
+    objects[2] = {
+        type: "key",
+        x: key.x,
+        y: key.y,
+    }
+
+    console.log(objects);
+    */
+
     console.log(start);
     console.log(end);
     console.log(key);
 
-    let objects = new Array2d(width,height);
-    objects.fill((x,y) => {
-        return 0;
-    });
-    objects.set(start.x,start.y,2);
-    objects.set(end.x,end.y,3);
-    objects.set(key.x,key.y,4);
-
     return {
         dungeon: dungeon,
-        objects: objects,
+        //objects: objects,
         start: start,
         end: end,
         key: key,
