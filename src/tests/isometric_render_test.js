@@ -29,7 +29,7 @@ start(() => {
     }
     const mode = 'isometric';
     const renderables = buildRenderList({ tiles: floors, mode, order: (t, x, y) => x + y - 100 })
-        .concat(buildRenderList({ tiles: objects, mode, order: (t, x, y) => x + y }))
+        //.concat(buildRenderList({ tiles: objects, mode, order: (t, x, y) => x + y }))
         .concat(buildRenderList({ tiles: walls, mode, order: (t, x, y) => x + y + wallOrdering[t[t.length-1]] }))
     ;
 
