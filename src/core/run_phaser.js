@@ -24,15 +24,20 @@ export function runPhaser (scene) {
                 let cursors = this.input.keyboard.createCursorKeys();
                 let controlConfig = {
                     camera: this.camera,
-                    left: cursors.left,
-                    right: cursors.right,
-                    up: cursors.up,
-                    down: cursors.down,
+                    left: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A),
+                    right: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D),
+                    up: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W),
+                    down: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S),
                     zoomIn: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q),
                     zoomOut: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E),
                     speed: SPEED,
                 }
                 controls = new Phaser.Cameras.Controls.FixedKeyControl(controlConfig);
+                let restartKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
+                restartKey.on('down', function(){
+                    document.location.reload();
+                })
+
             }, scene.init),
             update: composeSequential(function (time, delta) {
                 controls.update(delta);

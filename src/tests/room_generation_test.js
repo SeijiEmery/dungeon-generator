@@ -49,9 +49,7 @@ start(() => {
                         tileset: PATHTILE
                     });
                 }  
-            }
-
-            
-        }
+            }    
+        },
     })
 })

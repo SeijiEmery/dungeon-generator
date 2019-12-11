@@ -11,9 +11,10 @@ const PATHTILE = [ "chair_E" ];
 const PATHKEY = [ "chair_N" ];
 start(() => {
     const game = runPhaser({
+        
         create: function() {
             // manually set dungeon size + camera zoom (override config...?)
-            this.camera.zoom = 0.4;
+            //this.camera.zoom = 0.4;
             dungeon.width = 20;
             dungeon.height = 20;
             let tiles = basic_dungeon(dungeon);
@@ -23,7 +24,6 @@ start(() => {
                 spacing: 60,
                 tileset: TILESET
             });
-
             ///////////////////////to key
                             //grid, start, end,  dungeonGridWidth, dungeonGrid Height
             let keyPath = convert_path(tiles.dungeon, tiles.start, tiles.key,dungeon.width,dungeon.height);
