@@ -1,9 +1,10 @@
 import { Array2d } from '../core/array2d'
 
 function init(grid) {
-	for(var i = 0; i < grid.width; i++){
-		for(var j = 0; j < grid.height; j++){
-			grid.set(i,j, {
+	var newGrid = new Array2d(grid.width, grid.height);
+	for(var i = 0; i < newGrid.width; i++){
+		for(var j = 0; j < newGrid.height; j++){
+			newGrid.set(i,j, {
 				x: i,
 				y: j,
 				wall: grid.get(i,j), 
@@ -14,7 +15,10 @@ function init(grid) {
 			})
 		}
 	}
-	console.log(grid);
+	console.log(grid,"init");
+	console.log(newGrid, "init");
+	return newGrid;
+	
 }
 
 
@@ -49,10 +53,11 @@ function getNeighbors(grid, node) {
 }
 
 export function search(grid, start, end) {
-		init(grid); //grid is mutated
+		var searchGrid = init(grid);
+		console.log(searchGrid, "IN search")
 		var openList = [];
 		var closedList = [];
-		openList.push(grid.get(start.x,start.y));
+		openList.push(searchGrid.get(start.x,start.y));
 		//console.log(openList,openList.length, "Start Push");
 		var test_length = 20;
 		var pushCount = 0;
@@ -92,7 +97,7 @@ export function search(grid, start, end) {
 			closedList.push(currentNode);
 			//console.log(closedList,closedList.length, "Add to closedList");
 
-			var neighbors = getNeighbors(grid, currentNode);
+			var neighbors = getNeighbors(searchGrid, currentNode);
 			//console.log(neighbors,"All neighbor");
 			
 			for (var i = 0; i < neighbors.length; i++) {
@@ -149,16 +154,19 @@ export function search(grid, start, end) {
 }
 
 export function convert_path(grid, start, end, width, height){
-	var path = search(grid,start,end);
+	var findPath = grid;
+	//console.log(grid,"grid in convert_path");
+	//console.log(findPath,"findPath in convert_path");
+	var path = search(findPath,start,end);
 	path.pop();
-	//console.log(path, path.length,"Shorter Path in convert_path");
+	console.log(path, path.length,"Shorter Path in convert_path");
     var newPath = new Array2d(width,height);
         newPath.fill((x,y) => {
             return 0;
         });
     for(var i = 0; i < path.length; i++){
         newPath.set(path[i].x,path[i].y,1);
-        //console.log(newPath.get(path[i].x,path[i].y), "path.get");
+       	console.log(newPath.get(path[i].x,path[i].y), "path.get");
 	}
 	return newPath;
 }
