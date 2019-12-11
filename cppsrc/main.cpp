@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <cstdarg>
 #include <string>
+#include <memory>
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
@@ -49,14 +50,35 @@ struct TimeSystem {
     }
 };
 
-struct RenderSystem {
-    static void init () {}
-    static void update () {}
+template <typename T>
+struct SingletonOf {
+    static std::unique_ptr<T> instance;
+
+    template <typename... Args>
+    static void init (Args... args) { 
+        instance = std::unique_ptr<T>(new T(args...));
+    }
+    template <typename... Args>
+    static void update (Args... args) {
+        instance->update(args...);
+    }
 };
+#define DEFINE_SINGLETON(System) \
+    template<> std::unique_ptr<System> SingletonOf<System>::instance = nullptr;
+
+struct RenderSystem {
+    RenderSystem () {
+        printf("init renderer!\n");
+    }
+    void update () {
+        printf("update renderer!\n");
+    }
+};
+DEFINE_SINGLETON(RenderSystem)
 
 #define ALL_SYSTEMS \
     TimeSystem, \
-    RenderSystem \
+    SingletonOf<RenderSystem> \
 
 template <typename... Systems>
 struct SystemRunner;
