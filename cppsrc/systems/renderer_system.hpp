@@ -10,6 +10,10 @@ struct RendererSystem {
     }
     void update () {
         printf("update renderer!\n");
+
+        int* foo = nullptr;
+        *foo = 10;
+
         // ENFORCE(false, "error %d!", -1);
     }
 };
