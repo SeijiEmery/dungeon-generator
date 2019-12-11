@@ -27,11 +27,60 @@ std::string format(const char* fmt, ...) {
 #define THROW(...) throw std::runtime_error(format(__VA_ARGS__))
 #define ENFORCE(expr, ...) if (!(expr)) { THROW(__VA_ARGS__); }
 
+static void errorCallback(int error, const char* description) {
+    fprintf(stderr, "GLFW error %d: %s\n", error, description);
+}
+
+struct Time {
+    static double time;
+    static double dt;
+};
+struct TimeSystem {
+    static void init () {
+        Time::time = glfwGetTime();
+    }
+    static void update () {
+        auto t0 = Time::time;
+        Time::time = glfwGetTime();
+        Time::dt = Time::time - t0;
+    }
+};
+
+struct RenderSystem {
+    static void init () {}
+    static void udpate () {}
+};
+
+#define SYSTEMS \
+    TimeSystem, \
+    RenderSystem, \
+
+template <typename... Systems>
+struct SystemRunner;
+
+template <>
+struct SystemRunner<> {
+    template <typename... Args>
+    static void init (Args... args) {}
+    template <typename... Args>
+    static void update (Args... args) {}
+};
+template <typename S, typename... Systems>
+struct SystemRunner<S, Systems...> {
+    template <typename... Args>
+    static void init (Args... args) { S::init(args...); SystemRunner<Systems...>::init(args...); }
+    template <typename... Args>
+    static void update (Args... args) { S::update(args...); SystemRunner<Systems...>::update(args...); }
+};
+
+template <typename... Systems>
 class Application {
     GLFWwindow* window = nullptr;
 public:
     Application () {
         ENFORCE(glfwInit(), "Failed to initialize glfw!");
+        glfwSetErrorCallback(errorCallback);
+
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -49,16 +98,17 @@ public:
     void run () {
         glfwMakeContextCurrent(window);
         glfwSwapInterval(1);
+
+        SystemRunner<Systems...>::init();
+
         while (!glfwWindowShouldClose(window)) {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            update();
+
+            SystemRunner<Systems...>::update();
+            
             glfwSwapBuffers(window);
             glfwPollEvents();
         }
-    }
-private:
-    void update () {
-
     }
 };
 
