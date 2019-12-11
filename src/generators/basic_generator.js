@@ -53,19 +53,27 @@ export function basic_dungeon (params) {
         x: 0,
         y: 0,
     }
+    let key = {
+        x: 0,
+        y: 0,
+    }
 
     start.x = rooms[0].x + randInt(rooms[0].width);
     start.y = rooms[0].y + randInt(rooms[0].height);
 
+    key.x = rooms[1].x + randInt(rooms[1].width);
+    key.y = rooms[1].y + randInt(rooms[1].height);
+
     end.x = rooms[numRooms-1].x + randInt(rooms[numRooms-1].width);
     end.y = rooms[numRooms-1].y + randInt(rooms[numRooms-1].height);
 
-    /*return {
+    return {
         dungeon: dungeon,
         start: start,
         end: end,
-    };*/
-    return dungeon;
+        key: key,
+    };
+   // return dungeon;
 }
 
 function create_bend (array, xroom1, yroom1, xroom2, yroom2){
