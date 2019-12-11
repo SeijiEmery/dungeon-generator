@@ -1,11 +1,11 @@
 window:
-  width: 800
-  height: 800
+  width: 2000
+  height: 1000
 
 dungeon:
-  width: 100
-  height: 100
-  rooms: 50
+  width: 40
+  height: 40
+  rooms: 20
 
 random:
   seed: 8ae8865c461f77fd321851c830f8bbeb49df254d
