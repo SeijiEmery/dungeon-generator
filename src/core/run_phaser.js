@@ -15,6 +15,7 @@ export function runPhaser (scene) {
         width: WINDOW_WIDTH,
         height: WINDOW_HEIGHT,
         scene: {
+            clickButton: 0,
             preload: composeSequential(loadAllAssets, scene.preload),
             init: composeSequential(function () {
                 // set camera zoom from config
@@ -34,9 +35,18 @@ export function runPhaser (scene) {
                 }
                 controls = new Phaser.Cameras.Controls.FixedKeyControl(controlConfig);
 
+
+                scene.clickButton = this.add.text(this.camera.x, this.camera.y, 'RESTART', { fontSize: 32/this.camera.zoom, fill: '#0f0' })
+                        .setInteractive()
+                        .on('pointerdown', function() {
+                            document.location.reload();
+                        });
+                scene.clickButton.setScrollFactor(0);  
             }, scene.init),
             update: composeSequential(function (time, delta) {
                 controls.update(delta);
+                this.children.bringToTop(scene.clickButton);
+                scene.clickButton.setFontSize(32/this.camera.zoom);
             }, scene.update),
             ...scene
         }
