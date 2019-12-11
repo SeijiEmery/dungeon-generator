@@ -111,12 +111,12 @@ def launch_server():
                 self.process.join()
         return ProcessLauncher(run_tcp_server, *args)
 
-    if URL.startswith('127'):
-        with launch_tcp_server(*SERVER_ADDRESS, '../build'):
-            run_observers()
-    else:
-        from multiprocessing import Process
-        Process(target=run_tcp_server, args=list(SERVER_ADDRESS)+[ '../build', False ]).start()
+    # if URL.startswith('127'):
+    #     with launch_tcp_server(*SERVER_ADDRESS, '../build'):
+    #         run_observers()
+    # else:
+    from multiprocessing import Process
+    Process(target=run_tcp_server, args=list(SERVER_ADDRESS)+[ '../build', False ]).start()
 
 
 def run_observers():

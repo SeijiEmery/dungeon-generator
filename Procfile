@@ -1,1 +1,1 @@
-web: ./deploy.sh pure-stream-12121.herokuapp.com
+web: ./deploy.sh 127.0.0.1
