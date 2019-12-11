@@ -26,8 +26,9 @@ start(() => {
             });
 
             let keyPath = convert_path(tiles, output.start, output.key,dungeon.width,dungeon.height);
-
+            
             if(keyPath <= 0){
+                let keyFail  = this.add.text(-200, this.camera.y, "CAN'T PATH TO KEY", {fontSize: 400, color:'#00ff00'});
                 console.log("FAILURE TO GET KEY")
             }
             else{
@@ -37,18 +38,19 @@ start(() => {
                     tileset: PATHKEY
                 });
 
-            ///////////////////////to end  
-            let path = convert_path(tiles, output.key, output.end,dungeon.width,dungeon.height);
-            if(path <= 0){
-                console.log("FAILURE TO GO TO END")
-            }
-            else{
-                drawBasicGrid(this, {
-                    grid: path,
-                    spacing: 60,
-                    tileset: PATHTILE
-                });
-            }  
+                ///////////////////////to end  
+                let path = convert_path(tiles, output.key, output.end,dungeon.width,dungeon.height);
+                if(path <= 0){
+                    let endFail  = this.add.text(-200, this.camera.y, "CAN'T PATH TO END", {fontSize: 400, color:'#00ff00'});
+                    console.log("FAILURE TO GO TO END")
+                }
+                else{
+                    drawBasicGrid(this, {
+                        grid: path,
+                        spacing: 60,
+                        tileset: PATHTILE
+                    });
+                }  
             }
 
             
