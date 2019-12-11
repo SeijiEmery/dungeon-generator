@@ -8,13 +8,13 @@ from rebuild_phaser_renderer import \
     generate_webpack_builds
 from utils import load_yaml, write_yaml
 
-URL = 'pure-stream-12121.herokuapp.com'
+URL = sys.argv[1]
 PORT = 5000
 MAX_PORT_OPEN_ATTEMPTS = 20
-SERVER_ADDRESS = ('', PORT)
+SERVER_ADDRESS = (URL, PORT)
 
-if len(sys.argv) == 2:
-    OBSERVED_PATH = '../build/%s.html' % sys.argv[1]
+if len(sys.argv) == 3:
+    OBSERVED_PATH = '../build/%s.html' % sys.argv[2]
 else:
     OBSERVED_PATH = '../build'
 
@@ -28,7 +28,7 @@ def try_kill_listening_port(port):
 
 
 def make_server_active(url):
-    write_yaml('../build/server.yaml', {'url': url})
+    write_yaml('../build/server.yaml', {'url': 'http://'+url})
 
 
 def get_server_url():
@@ -72,7 +72,7 @@ def run_tcp_server(address, port, path, open_in_browser=True):
             with socketserver.TCPServer((address, port), Handler) as httpd:
                 url = '%s:%s' % (URL, port)
                 make_server_active(url)
-                print("serving '%s' at %s:%s" %
+                print("serving '%s' at http://%s:%s" %
                         (path, URL, port))
                 if open_in_browser:
                     open_observed_file()
