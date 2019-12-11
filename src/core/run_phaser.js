@@ -34,17 +34,6 @@ export function runPhaser (scene) {
                 }
                 controls = new Phaser.Cameras.Controls.FixedKeyControl(controlConfig);
 
-                var clickButton = this.add.text(this.camera.x, this.camera.y, 'RESTART', { fill: '#0f0' })
-                      .setInteractive()
-                      .on('pointerdown', function() {
-                document.location.reload();
-                console.log(game.scene);
-            });
-            clickButton.setScrollFactor(0);
-            console.log(clickButton.x, "fixedToCamera");   
-
-
-
             }, scene.init),
             update: composeSequential(function (time, delta) {
                 controls.update(delta);
