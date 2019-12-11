@@ -8,8 +8,8 @@ from rebuild_phaser_renderer import \
     generate_webpack_builds
 from utils import load_yaml, write_yaml
 
-URL = sys.argv[1]
-PORT = 5000
+URL, PORT = sys.argv[1].split(':')
+PORT = int(PORT)
 MAX_PORT_OPEN_ATTEMPTS = 20
 SERVER_ADDRESS = (URL, PORT)
 
