@@ -22,10 +22,6 @@ public:
             "dungeon-generator", NULL, NULL);
         ENFORCE(window != nullptr, "Failed to create GLFW window\n");
     }
-    ~Application() {
-        if (!window) { glfwDestroyWindow(window); }
-        glfwTerminate();
-    }
     void run () {
         glfwMakeContextCurrent(window);
         glfwSwapInterval(1);
@@ -43,5 +39,10 @@ public:
             glfwSwapBuffers(window);
             glfwPollEvents();
         }
+    }
+    ~Application() {
+        SystemRunner<Systems...>::teardown();
+        if (!window) { glfwDestroyWindow(window); }
+        glfwTerminate();
     }
 };

@@ -4,6 +4,7 @@
 // tell .hpp files to include their static variable impls in this .cpp file
 #define CPP_STATICS
 #include "application.hpp"
+#include "all_systems.hpp"
 
 
 int main(int argc, char *argv[]) {

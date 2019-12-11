@@ -11,4 +11,5 @@ struct TimeSystem {
         Time::time = glfwGetTime();
         Time::dt = Time::time - t0;
     }
+    static void teardown () {}
 };
