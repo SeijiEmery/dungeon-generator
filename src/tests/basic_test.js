@@ -13,7 +13,8 @@ start(() => {
             this.camera.zoom = 0.4;
             dungeon.width = 20;
             dungeon.height = 20;
-            let tiles = basic_dungeon(dungeon);
+            let output = basic_dungeon(dungeon);
+            let tiles = output.dungeon;
             drawBasicGrid(this, {
                 grid: tiles,
                 spacing: 60,
