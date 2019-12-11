@@ -35,6 +35,9 @@ struct Time {
     static double time;
     static double dt;
 };
+double Time::time = 0;
+double Time::dt = 0;
+
 struct TimeSystem {
     static void init () {
         Time::time = glfwGetTime();
@@ -48,12 +51,12 @@ struct TimeSystem {
 
 struct RenderSystem {
     static void init () {}
-    static void udpate () {}
+    static void update () {}
 };
 
-#define SYSTEMS \
+#define ALL_SYSTEMS \
     TimeSystem, \
-    RenderSystem, \
+    RenderSystem \
 
 template <typename... Systems>
 struct SystemRunner;
@@ -100,11 +103,14 @@ public:
         glfwSwapInterval(1);
 
         SystemRunner<Systems...>::init();
+        glfwPollEvents();
 
         while (!glfwWindowShouldClose(window)) {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             SystemRunner<Systems...>::update();
+            printf("time = %0.2lf, dt = %0.2lf, fps = %0.1lf\n",
+                Time::time, Time::dt, 1.0 / Time::dt);
             
             glfwSwapBuffers(window);
             glfwPollEvents();
@@ -114,7 +120,7 @@ public:
 
 int main(int argc, char *argv[]) {
     try {
-        Application().run();
+        Application<ALL_SYSTEMS>().run();
     } catch (const std::exception& e) {
         fprintf(stderr, "terminated with error:\n\t%s\n", e.what());
         exit(-1);
