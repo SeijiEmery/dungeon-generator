@@ -180,8 +180,17 @@ export function graph_dungeon (params) {
     console.log(end);
     console.log(key);
 
+    let objects = new Array2d(width,height);
+    objects.fill((x,y) => {
+        return 0;
+    });
+    objects.set(start.x,start.y,2);
+    objects.set(end.x,end.y,3);
+    objects.set(key.x,key.y,4);
+
     return {
         dungeon: dungeon,
+        objects: objects,
         start: start,
         end: end,
         key: key,
