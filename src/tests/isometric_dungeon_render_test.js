@@ -146,17 +146,8 @@ start(() => {
     //   (i, j) => i + j * W
     // 
 
-    // This is hard-coded in for now.  
-    function pickFloor() {
-        if (random() < .12){
-            return tileset.floors.length + 5 + randInt(4);
-        }
-        else{
-            return tileset.floors.length + 9 + randInt(4);
-        }
-    };
     const floors = fill(null, WIDTH, HEIGHT, (i,j) =>
-        output.dungeon.get(i,j) == 0 ? pickFloor() : tileset.floors.length + 4
+        output.dungeon.get(i,j) == 0 ? randomTile(tileset.floors, 4) : 0
     );
 
     function randomTile (tileset, rotations) {
@@ -164,7 +155,7 @@ start(() => {
     }
     // Objects: objects / doodads that can be drawn on top of the sprites
     const objects = fill(null, WIDTH, HEIGHT, (i,j) =>
-        (output.dungeon.get(i,j) == 0 ) && random() < .001 ? randomTile(tileset.objects, 4) : 0
+        (output.dungeon.get(i,j) == 0 ) && random() < 0 ? randomTile(tileset.objects, 4) : 0
     );
 
     // Heights: heightmap / height offset for each tile
