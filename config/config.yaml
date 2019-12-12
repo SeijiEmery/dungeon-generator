@@ -1,14 +1,19 @@
 window:
-  width: 800
-  height: 600
+  width: 2000
+  height: 1000
 
 dungeon:
-  width: 10
-  height: 10
+  width: 40
+  height: 40
+  rooms: 20
 
 random:
   seed: 8ae8865c461f77fd321851c830f8bbeb49df254d
-  useFixedSeed: true
+  useFixedSeed: false
+
 
 camera:
   zoom: 0.4
+  origin: -10000
+  width: 20000
+  speed: 3.0

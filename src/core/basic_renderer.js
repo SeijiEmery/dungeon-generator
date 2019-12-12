@@ -24,7 +24,7 @@ export function drawBasicGrid(game, params) {
     console.log(`${offset_x} ${total_width} ${grid.width} ${spacing_x}`)
 
     grid.forEach((tile, x, y) => {
-        console.log(`generating '${tile}' at ${x}, ${y}`);
+        //console.log(`generating '${tile}' at ${x}, ${y}`);
         if (tile && tileset[tile-1]) {
             drawTile(game,
                 tileset[tile-1], 
@@ -35,7 +35,7 @@ export function drawBasicGrid(game, params) {
 }
 
 export function drawTile(game, tile, x, y) {
-    console.log(`drawing '${tile}' at ${x}, ${y}`);
+    //console.log(`drawing '${tile}' at ${x}, ${y}`);
     game.add.image(x, y, tile);
 }
 

@@ -6,16 +6,16 @@ assets:
   walls:
     - stoneWall
     - stoneWallAged
-    - stoneWallStructure
+    # - stoneWallStructure
     - stoneWallWindow
     - stoneWallWindowBars
     - stoneWallHalf
-    - stoneWallGate
-    - stoneWallGateBars
-    - stoneWallGateClosed
-    - stoneWallGateOpen
-    - wallBooks
-    - wallDoorway
+    # - stoneWallGate
+    # - stoneWallGateBars
+    # - stoneWallGateClosed
+    # - stoneWallGateOpen
+    # - wallBooks
+    # - wallDoorway
 
   walls_end:
     - stoneWallBroken
@@ -31,7 +31,7 @@ assets:
     - barrel
     # - barrels
     # - barrelsStacked
-    # - chair
+    - chair
     # - tableChairsBroken
     # - tableRound
     # - stairs
