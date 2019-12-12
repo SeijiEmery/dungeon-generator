@@ -31,6 +31,8 @@ Lastly, install webpack-cli: `npm install -g webpack-cli`
 
 # Overview:
 
+![Alt text](/screenshot.png?raw=true "Screenshot")
+
 Procedural dungeon generator implemented for CMPM 147 over ~2 weeks. Uses a very simple phaser renderer and these asset packs from kenney.nl:
 
 - https://www.kenney.nl/assets/isometric-dungeon-tiles
